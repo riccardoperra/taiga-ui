@@ -21,6 +21,7 @@ import {
 } from '@taiga-ui/cdk';
 import {
     formatNumber,
+    getFractionPartPadded,
     maskedMoneyValueIsEmpty,
     maskedNumberStringToNumber,
     NumberFormatSettings,
@@ -126,9 +127,7 @@ export class TuiInputNumberComponent
         const hasFraction = absValue % 1 > 0;
         let limit = this.decimal === 'always' || hasFraction ? this.precision : 0;
 
-        const fraction = hasFraction
-            ? value.toString().split('.')[1].substr(0, this.precision)
-            : '';
+        const fraction = hasFraction ? getFractionPartPadded(value, this.precision) : '';
 
         if (this.focused && this.decimal !== 'always') {
             limit = fraction.length;
@@ -173,23 +172,24 @@ export class TuiInputNumberComponent
     mask: TuiMapper<boolean, TuiTextMaskOptions> = (
         allowNegative: boolean,
         decimal: TuiDecimalT,
-        precision: number,
+        decimalLimit: number,
         nativeFocusableElement: HTMLInputElement | null,
     ) => ({
         mask: tuiCreateNumberMask({
-            allowNegative: allowNegative,
+            allowNegative,
+            decimalLimit,
             allowDecimal: decimal !== 'never',
-            decimalLimit: precision,
             requireDecimal: decimal === 'always',
             autoCorrectDecimalSymbol: false,
             decimalSymbol: this.numberFormat.decimalSeparator,
             thousandSymbol: this.numberFormat.thousandSeparator,
         }),
         pipe: tuiCreateAutoCorrectedNumberPipe(
-            decimal === 'always' ? precision : 0,
+            decimal === 'always' ? decimalLimit : 0,
             this.numberFormat.decimalSeparator,
             this.numberFormat.thousandSeparator,
             nativeFocusableElement || undefined,
+            allowNegative,
         ),
         guide: false,
     });
