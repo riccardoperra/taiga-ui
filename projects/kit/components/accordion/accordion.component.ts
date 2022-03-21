@@ -9,13 +9,12 @@ import {
 } from '@angular/core';
 import {
     EMPTY_QUERY,
-    identity,
     isPresent,
     itemsQueryListObservable,
     tuiDefaultProp,
     TuiDestroyService,
 } from '@taiga-ui/cdk';
-import {merge} from 'rxjs';
+import {identity, merge} from 'rxjs';
 import {filter, map, mapTo, pairwise, switchMap, takeUntil} from 'rxjs/operators';
 
 import {TuiAccordionItemComponent} from './accordion-item/accordion-item.component';
@@ -50,7 +49,7 @@ export class TuiAccordionComponent implements AfterContentInit {
         const newOpenRow$ = rows$.pipe(
             pairwise(),
             map(([previous, current]) =>
-                current.find(item => previous.indexOf(item) === -1 && item.open),
+                current.find(item => !previous.includes(item) && item.open),
             ),
             filter(isPresent),
         );

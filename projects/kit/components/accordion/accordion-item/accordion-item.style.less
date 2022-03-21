@@ -102,21 +102,21 @@
         padding-right: 0.75rem;
     }
 
-    :host._hovered:not([data-mode]) & {
+    :host:hover:not([data-mode]) & {
         background: var(--tui-base-02);
     }
 
-    :host._hovered[data-mode='onDark'] &,
+    :host:hover[data-mode='onDark'] &,
     :host[data-mode='onDark'] &_open {
         background: var(--tui-clear-inverse);
     }
 
-    :host._hovered[data-mode='onLight'] &,
+    :host:hover[data-mode='onLight'] &,
     :host[data-mode='onLight'] &_open {
         background: var(--tui-clear);
     }
 
-    :host[data-tui-host-size='s'] & {
+    :host[data-size='s'] & {
         font: var(--tui-font-text-m);
         min-height: var(--tui-height-m);
         padding: 0.625rem 0.75rem 0.625rem 1rem;
@@ -157,7 +157,7 @@
         opacity: var(--tui-disabled-opacity);
     }
 
-    :host._hovered[data-mode] & {
+    :host:hover[data-mode] & {
         opacity: 0.8;
     }
 
@@ -169,7 +169,7 @@
         color: var(--tui-text-01);
     }
 
-    :host._hovered:not([data-mode]) & {
+    :host:hover:not([data-mode]) & {
         color: var(--tui-base-07);
     }
 }
@@ -179,7 +179,7 @@
     padding: 1.25rem;
     word-wrap: break-word;
 
-    :host[data-tui-host-size='s'] & {
+    :host[data-size='s'] & {
         font: var(--tui-font-text-s);
         padding: 1rem;
     }

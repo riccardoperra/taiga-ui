@@ -1,4 +1,4 @@
-import {NIGHT_THEME_KEY} from './shared.entities';
+import {DEFAULT_TIMEOUT_AFTER_PAGE_REDIRECTION, NIGHT_THEME_KEY} from './shared.entities';
 import {stubExternalIcons} from './stub-external-icons.util';
 import {waitAllRequests} from './wait-requests.util';
 
@@ -15,6 +15,9 @@ interface Options {
     inIframe?: boolean;
     waitAllIcons?: boolean;
     enableNightMode?: boolean;
+    hideCursor?: boolean;
+    hideScrollbar?: boolean;
+    noSmoothScroll?: boolean;
 }
 
 const setBeforeLoadOptions = (
@@ -28,9 +31,17 @@ const setBeforeLoadOptions = (
 };
 
 export const goToDemoPage = (path: string, options: Options = {}) => {
-    const {inIframe = true, waitAllIcons = false, enableNightMode = false} = options;
+    const {
+        inIframe = true,
+        waitAllIcons = true,
+        enableNightMode = false,
+        hideCursor = true,
+        hideScrollbar = true,
+        noSmoothScroll = true,
+    } = options;
 
     stubExternalIcons();
+
     cy.visit('/', {
         onBeforeLoad: window => {
             const baseHref =
@@ -50,11 +61,29 @@ export const goToDemoPage = (path: string, options: Options = {}) => {
     }
 
     cy.window().should('have.property', 'Cypress');
+
     cy.url().should('include', path);
     cy.clearLocalStorage(NEXT_URL_STORAGE_KEY);
+
     cy.document().its('fonts.status').should('equal', 'loaded');
 
     if (waitAllIcons) {
         waitAllRequests('@icons');
     }
+
+    cy.get('._is-cypress-mode').as('app');
+
+    if (hideCursor) {
+        cy.get('@app').invoke('addClass', '_hide-cursor');
+    }
+
+    if (hideScrollbar) {
+        cy.get('@app').invoke('addClass', '_hide-scrollbar');
+    }
+
+    if (noSmoothScroll) {
+        cy.get('@app').invoke('addClass', '_no-smooth-scroll');
+    }
+
+    cy.wait(DEFAULT_TIMEOUT_AFTER_PAGE_REDIRECTION);
 };

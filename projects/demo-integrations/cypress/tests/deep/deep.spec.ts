@@ -35,35 +35,28 @@ const makeDemoSnapshot = (
     optionIndex: number,
 ) => {
     cy.wrap($input)
-        .parents('.tui-table tr')
+        .parents('table.t-table tr')
         .find('[automation-id="tui-documentation__property-name"]')
         .then(propertyName$ => propertyName$.text().trim())
         .then(property => {
             return cy
                 .get(`#demoContent`)
                 .first()
-                .wait(200)
                 .matchImageSnapshot(`${path}/${stepIndex}-${property}-${optionIndex}`);
         });
 };
 
 describe('Deep', () => {
-    beforeEach(() => {
-        cy.viewport(1500, 3200);
-    });
-
-    DEEP_PATHS.forEach(path => {
+    for (const path of DEEP_PATHS) {
         it(path, () => {
             let counter = 1;
 
+            cy.viewport(1440, 1920); // TODO: need investigate later, why failed less than 1920px
             cy.goToDemoPage(`/${path}/API`);
             cy.hideHeader();
 
-            cy.get(`.tui-table tui-select`).each(($select, selectIndex) => {
-                if (
-                    selectExclusions[path] &&
-                    selectExclusions[path].includes(selectIndex)
-                ) {
+            cy.get(`table.t-table tui-select`).each(($select, selectIndex) => {
+                if (selectExclusions[path]?.includes(selectIndex)) {
                     return cy.wrap($select);
                 }
 
@@ -82,7 +75,7 @@ describe('Deep', () => {
                             .click()
                             .get(`[tuioption]`)
                             .eq(optionIndex)
-                            .click();
+                            .click({force: true});
 
                         return makeDemoSnapshot(path, counter++, $select, optionIndex);
                     })
@@ -90,20 +83,17 @@ describe('Deep', () => {
                     .click()
                     .get(`[tuioption]`)
                     .first()
-                    .click();
+                    .click({force: true});
             });
 
-            cy.get('.tui-table')
+            cy.get('table.t-table')
                 .then($table =>
                     $table.find('tui-toggle').length
-                        ? cy.get('.tui-table tui-toggle')
+                        ? cy.get('table.t-table tui-toggle')
                         : [],
                 )
                 .each((toggle$, index) => {
-                    if (
-                        toggleExclusions[path] &&
-                        toggleExclusions[path].includes(index)
-                    ) {
+                    if (toggleExclusions[path]?.includes(index)) {
                         return cy.wrap(toggle$);
                     }
 
@@ -112,5 +102,5 @@ describe('Deep', () => {
                     return makeDemoSnapshot(path, counter++, toggle$, 0);
                 });
         });
-    });
+    }
 });

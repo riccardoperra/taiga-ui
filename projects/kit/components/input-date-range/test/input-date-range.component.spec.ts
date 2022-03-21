@@ -16,8 +16,7 @@ import {
     TUI_DATE_RANGE_VALUE_TRANSFORMER,
     TUI_DATE_VALUE_TRANSFORMER,
 } from '@taiga-ui/kit/tokens';
-import {NativeInputPO, PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, NativeInputPO, PageObject} from '@taiga-ui/testing';
 
 import {TuiDayRangePeriod} from '../../../classes/day-range-period';
 import {TuiInputDateRangeComponent} from '../input-date-range.component';
@@ -39,7 +38,7 @@ import {TuiInputDateRangeModule} from '../input-date-range.module';
 })
 class TestComponent {
     @ViewChild(TuiInputDateRangeComponent)
-    readonly component: TuiInputDateRangeComponent;
+    readonly component!: TuiInputDateRangeComponent;
 
     readonly control = new FormControl(
         new TuiDayRange(
@@ -452,6 +451,6 @@ function getCalendarCell(
     return (
         pageObject
             .getAllByAutomationId('tui-primitive-calendar__cell', calendarEl)
-            .find(el => +el.nativeElement.innerText.trim() === dayNumber) || null
+            .find(el => Number(el.nativeElement.innerText.trim()) === dayNumber) || null
     );
 }

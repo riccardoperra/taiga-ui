@@ -29,9 +29,9 @@ export const ALLOWED_SPACE_REGEXP = new RegExp(`,|[\\s]`);
 
 @Component({
     selector: 'tui-tag, a[tuiTag]',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     templateUrl: './tag.template.html',
     styleUrls: ['./tag.style.less'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [MODE_PROVIDER],
     host: {
         '($.data-mode.attr)': 'mode$',
@@ -47,16 +47,21 @@ export class TuiTagComponent {
     @tuiDefaultProp()
     editable = false;
 
+    // TODO: Remove in 3.0
     @Input()
     @tuiDefaultProp()
     allowSpaces = true;
 
     @Input()
     @tuiDefaultProp()
+    separator: string | RegExp = ',';
+
+    @Input()
+    @tuiDefaultProp()
     maxLength: number | null = null;
 
     @Input()
-    @HostBinding('attr.data-tui-host-size')
+    @HostBinding('attr.data-size')
     @tuiDefaultProp()
     size: TuiSizeS | TuiSizeL = 'm';
 
@@ -159,11 +164,11 @@ export class TuiTagComponent {
 
     onInput(value: string) {
         const newTags = this.allowSpaces
-            ? value.split(',')
+            ? value.split(this.separator)
             : value.split(ALLOWED_SPACE_REGEXP);
 
         if (newTags.length > 1) {
-            this.save(newTags.toString());
+            this.save(String(newTags));
 
             return;
         }

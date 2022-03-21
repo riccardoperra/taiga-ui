@@ -10,5 +10,6 @@ import {encapsulation} from '@demo/emulate/encapsulation';
     encapsulation,
 })
 export class TuiSliderExample1 {
-    testValue = new FormControl();
+    value = 4;
+    formControl = new FormControl(60);
 }

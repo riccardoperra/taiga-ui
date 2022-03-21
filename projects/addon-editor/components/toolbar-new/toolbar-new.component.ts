@@ -14,10 +14,15 @@ import {
     ViewChildren,
 } from '@angular/core';
 import {TuiEditor} from '@taiga-ui/addon-editor/abstract';
-import {defaultEditorColors, defaultEditorTools} from '@taiga-ui/addon-editor/constants';
+import {defaultEditorTools} from '@taiga-ui/addon-editor/constants';
 import {TuiTiptapEditorService} from '@taiga-ui/addon-editor/directives';
 import {TuiEditorTool} from '@taiga-ui/addon-editor/enums';
-import {TUI_EDITOR_TOOLBAR_TEXTS, TUI_IMAGE_LOADER} from '@taiga-ui/addon-editor/tokens';
+import {
+    TUI_EDITOR_OPTIONS,
+    TUI_EDITOR_TOOLBAR_TEXTS,
+    TUI_IMAGE_LOADER,
+    TuiEditorOptions,
+} from '@taiga-ui/addon-editor/tokens';
 import {
     EMPTY_QUERY,
     getClosestElement,
@@ -33,13 +38,6 @@ import {Observable} from 'rxjs';
 import {take} from 'rxjs/operators';
 
 import {TuiToolbarNavigationManagerDirective} from './toolbar-navigation-manager.directive';
-
-function toolsAssertion(tools: ReadonlyArray<TuiEditorTool>): boolean {
-    return (
-        tools.indexOf(TuiEditorTool.Tex) === -1 &&
-        tools.indexOf(TuiEditorTool.Attach) === -1
-    );
-}
 
 // @dynamic
 @Component({
@@ -60,12 +58,8 @@ export class TuiToolbarNewComponent {
     private readonly navigationManager?: TuiToolbarNavigationManagerDirective;
 
     @Input()
-    @tuiDefaultProp(toolsAssertion, 'Attach and TeX are not yet implemented in Editor')
-    tools: ReadonlyArray<TuiEditorTool> = defaultEditorTools;
-
-    @Input()
     @tuiDefaultProp()
-    colors: ReadonlyMap<string, string> = defaultEditorColors;
+    colors: ReadonlyMap<string, string> = this.defaultOptions.colors;
 
     @Input()
     @HostBinding('class._disabled')
@@ -83,6 +77,14 @@ export class TuiToolbarNewComponent {
 
     readonly TuiEditorTool: typeof TuiEditorTool = TuiEditorTool;
 
+    toolsSet: Set<TuiEditorTool> = new Set(defaultEditorTools);
+
+    @Input()
+    @tuiDefaultProp(toolsAssertion, 'Attach and TeX are not yet implemented in Editor')
+    set tools(value: ReadonlyArray<TuiEditorTool>) {
+        this.toolsSet = new Set(value);
+    }
+
     constructor(
         @Optional()
         @Inject(ElementRef)
@@ -92,6 +94,8 @@ export class TuiToolbarNewComponent {
         private readonly imageLoader: TuiHandler<File, Observable<string>>,
         @Inject(TUI_EDITOR_TOOLBAR_TEXTS)
         readonly texts$: Observable<LanguageEditor['toolbarTools']>,
+        @Inject(TUI_EDITOR_OPTIONS)
+        private readonly defaultOptions: TuiEditorOptions,
     ) {}
 
     get focused(): boolean {
@@ -106,35 +110,35 @@ export class TuiToolbarNewComponent {
     }
 
     get unorderedList(): boolean {
-        return !!this.editor.isActive('bulletList');
+        return this.editor.isActive('bulletList');
     }
 
     get orderedList(): boolean {
-        return !!this.editor.isActive('orderedList');
+        return this.editor.isActive('orderedList');
     }
 
     get blockquote(): boolean {
-        return !!this.editor.isActive('blockquote');
+        return this.editor.isActive('blockquote');
     }
 
     get a(): boolean {
-        return !!this.editor.isActive('link');
+        return this.editor.isActive('link');
     }
 
     get undoDisabled(): boolean {
-        return !!this.editor.undoDisabled();
+        return this.editor.undoDisabled();
     }
 
     get redoDisabled(): boolean {
-        return !!this.editor.redoDisabled();
+        return this.editor.redoDisabled();
     }
 
     get subscript(): boolean {
-        return !!this.editor.isActive('subscript');
+        return this.editor.isActive('subscript');
     }
 
     get superscript(): boolean {
-        return !!this.editor.isActive('superscript');
+        return this.editor.isActive('superscript');
     }
 
     get formatEnabled(): boolean {
@@ -217,7 +221,7 @@ export class TuiToolbarNewComponent {
     }
 
     enabled(tool: TuiEditorTool): boolean {
-        return this.tools.indexOf(tool) !== -1;
+        return this.toolsSet.has(tool);
     }
 
     undo() {
@@ -271,4 +275,8 @@ export class TuiToolbarNewComponent {
             setNativeFocused(lastButton);
         }
     }
+}
+
+function toolsAssertion(tools: ReadonlyArray<TuiEditorTool>): boolean {
+    return !tools.includes(TuiEditorTool.Tex) && !tools.includes(TuiEditorTool.Attach);
 }

@@ -11,13 +11,12 @@ import {
 } from '@angular/forms';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {TuiValidationError} from '@taiga-ui/cdk';
-import {NativeInputPO, PageObject} from '@taiga-ui/testing';
+import {configureTestSuite, NativeInputPO, PageObject} from '@taiga-ui/testing';
 import {
     PolymorpheusContent,
     PolymorpheusModule,
     PolymorpheusTemplate,
 } from '@tinkoff/ng-polymorpheus';
-import {configureTestSuite} from 'ng-bullet';
 
 import {TuiInputModule} from '../../input/input.module';
 import {TuiFieldErrorComponent} from '../field-error.component';
@@ -81,7 +80,7 @@ describe('FieldError', () => {
         })
         class TestComponent {
             @ViewChild(TuiFieldErrorComponent, {static: true})
-            component: TuiFieldErrorComponent;
+            component!: TuiFieldErrorComponent;
 
             testForm = new FormGroup({
                 formArray: new FormArray([new FormControl('')], [arrayValidator]),
@@ -149,7 +148,7 @@ describe('FieldError', () => {
         })
         class TestComponent {
             @ViewChild(TuiFieldErrorComponent, {static: true})
-            component: TuiFieldErrorComponent;
+            component!: TuiFieldErrorComponent;
 
             testForm = new FormGroup(
                 {
@@ -218,7 +217,7 @@ describe('FieldError', () => {
         })
         class TestComponent {
             @ViewChild('errorContent', {static: true})
-            errorContent: PolymorpheusTemplate<{}>;
+            errorContent!: PolymorpheusTemplate<{}>;
 
             readonly testMes = ZIP_CODE_MESSAGE;
 
@@ -226,7 +225,7 @@ describe('FieldError', () => {
                 control: new FormControl(),
             });
 
-            order: string[];
+            order!: string[];
         }
 
         let fixture: ComponentFixture<TestComponent>;

@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import {ANIMATION_FRAME, WINDOW} from '@ng-web-apis/common';
 import {
+    AbstractTuiPortalHostComponent,
     getClosestElement,
     getClosestFocusable,
     inRange,
@@ -19,8 +20,8 @@ import {
     setNativeFocused,
     TuiActiveZoneDirective,
     TuiDestroyService,
+    TuiDropdownHostComponent,
     TuiOverscrollModeT,
-    TuiPortalHostComponent,
     tuiPure,
     tuiZonefree,
 } from '@taiga-ui/cdk';
@@ -67,9 +68,6 @@ export class TuiDropdownBoxComponent implements AfterViewChecked {
     @HostBinding('@tuiDropdownAnimation')
     dropdownAnimation!: TuiAnimationOptions;
 
-    @ViewChild(TuiActiveZoneDirective)
-    readonly activeZone?: TuiActiveZoneDirective;
-
     @ViewChild('content', {read: ElementRef})
     readonly contentElementRef?: ElementRef<HTMLElement>;
 
@@ -80,8 +78,8 @@ export class TuiDropdownBoxComponent implements AfterViewChecked {
         @Inject(TUI_DROPDOWN_DIRECTIVE) readonly directive: TuiDropdown,
         @Inject(WINDOW) private readonly windowRef: Window,
         @Inject(ElementRef) private readonly elementRef: ElementRef<HTMLElement>,
-        @Inject(TuiPortalHostComponent)
-        private readonly portalHost: TuiPortalHostComponent,
+        @Inject(AbstractTuiPortalHostComponent)
+        private readonly portalHost: TuiDropdownHostComponent,
         @Inject(TUI_ANIMATION_OPTIONS) private readonly options: AnimationOptions,
         @Inject(ANIMATION_FRAME) animationFrame$: Observable<number>,
     ) {
@@ -365,7 +363,7 @@ export class TuiDropdownBoxComponent implements AfterViewChecked {
         const {ownerDocument} = host;
         const root = ownerDocument ? ownerDocument.body : host;
 
-        let focusable = getClosestFocusable(host, previous, root);
+        let focusable = getClosestFocusable(host as HTMLElement, previous, root);
 
         while (focusable !== null && host.contains(focusable)) {
             focusable = getClosestFocusable(focusable, previous, root);

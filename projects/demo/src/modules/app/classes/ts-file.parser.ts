@@ -1,3 +1,5 @@
+import {TuiTsParserException} from '@taiga-ui/cdk';
+
 export class TsFileParser {
     get className(): string {
         const [, className] = this.rawFileContent.match(/(?:export class\s)(\w*)/i) || [];
@@ -8,7 +10,7 @@ export class TsFileParser {
     set className(newClassName: string) {
         this.rawFileContent = this.rawFileContent.replace(
             /(export class\s)(\w*)/i,
-            '$1' + newClassName,
+            `$1${newClassName}`,
         );
     }
 
@@ -24,7 +26,7 @@ export class TsFileParser {
         const classesInside = rawFileContent.match(/export class/gi) || [];
 
         if (classesInside.length > 1) {
-            throw new Error('TsFileParser: 1 component/module per ts-file');
+            throw new TuiTsParserException();
         }
     }
 

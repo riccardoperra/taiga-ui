@@ -18,6 +18,7 @@ import {
     TUI_IS_MOBILE,
     TuiFocusableElementAccessor,
     TuiNativeFocusableElement,
+    tuiPure,
 } from '@taiga-ui/cdk';
 import {
     formatNumber,
@@ -25,6 +26,8 @@ import {
     maskedNumberStringToNumber,
     NumberFormatSettings,
     TUI_NUMBER_FORMAT,
+    TUI_TEXTFIELD_APPEARANCE,
+    TuiBrightness,
     TuiModeDirective,
 } from '@taiga-ui/core';
 import {AbstractTuiInputSlider} from '@taiga-ui/kit/abstract';
@@ -65,6 +68,8 @@ export class TuiInputRangeComponent
         private readonly isMobile: boolean,
         @Inject(TUI_NUMBER_FORMAT)
         protected readonly numberFormat: NumberFormatSettings,
+        @Inject(TUI_TEXTFIELD_APPEARANCE)
+        readonly appearance: string,
     ) {
         super(control, changeDetectorRef);
     }
@@ -95,6 +100,11 @@ export class TuiInputRangeComponent
         return !this.focusedRight && !!this.maxLabel && this.value[1] === this.max;
     }
 
+    @HostBinding('attr.data-mode')
+    get hostMode(): TuiBrightness | null {
+        return this.modeDirective && this.modeDirective.mode;
+    }
+
     get inputValueLeft(): string {
         return this.nativeLeft ? this.nativeLeft.nativeElement.value : '';
     }
@@ -104,11 +114,11 @@ export class TuiInputRangeComponent
     }
 
     get computedValueLeft(): string {
-        return this.formatNumber(this.value[0]);
+        return this.computedPureValueLeft(this.value[0]);
     }
 
     get computedValueRight(): string {
-        return this.formatNumber(this.value[1]);
+        return this.computedPureValueRight(this.value[1]);
     }
 
     onActiveZone(active: boolean) {
@@ -262,6 +272,16 @@ export class TuiInputRangeComponent
 
     protected getFallbackValue(): [number, number] {
         return [0, 0];
+    }
+
+    @tuiPure
+    private computedPureValueLeft(value: number) {
+        return this.formatNumber(value);
+    }
+
+    @tuiPure
+    private computedPureValueRight(value: number) {
+        return this.formatNumber(value);
     }
 
     private formatNumber(value: number): string {

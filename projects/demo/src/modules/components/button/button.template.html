@@ -98,6 +98,9 @@
                         [shape]="shape"
                         [showLoader]="showLoader"
                         [size]="size"
+                        [pseudoFocused]="pseudoFocused"
+                        [pseudoHovered]="pseudoHovered"
+                        [pseudoPressed]="pseudoPressed"
                     >
                         Content
                     </button>
@@ -189,6 +192,7 @@
                 Size
             </ng-template>
         </tui-doc-documentation>
+        <inherited-documentation></inherited-documentation>
     </ng-template>
 
     <ng-template pageTab>
@@ -202,7 +206,7 @@
 
                 <tui-doc-code
                     filename="myComponent.module.ts"
-                    [code]="exampleImportModule"
+                    [code]="exampleModule"
                 ></tui-doc-code>
             </li>
 
@@ -211,7 +215,7 @@
 
                 <tui-doc-code
                     filename="myComponent.template.html"
-                    [code]="exampleInsertTemplate"
+                    [code]="exampleHtml"
                 ></tui-doc-code>
             </li>
 
@@ -225,7 +229,7 @@
 
                 <tui-doc-code
                     filename="myComponent.module.ts"
-                    [code]="exampleDefineOptions"
+                    [code]="exampleOptions"
                 ></tui-doc-code>
             </li>
         </ol>

@@ -2,7 +2,6 @@ import {WAIT_BEFORE_SCREENSHOT} from './utils';
 
 describe("Editor's color picker", () => {
     beforeEach(() => {
-        cy.viewport(1400, 720);
         cy.goToDemoPage('components/color-picker');
         cy.hideHeader();
     });
@@ -32,6 +31,7 @@ describe("Editor's color picker", () => {
         cy.get('#dropdown').findByAutomationId('tui-doc-example').as(alias);
         cy.get('@wrapper')
             .scrollIntoView()
+            .should('be.visible')
             .findByAutomationId('color-picker__button')
             .click();
     }

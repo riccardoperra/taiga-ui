@@ -2,8 +2,7 @@ import {Component, ViewChild} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {CHAR_NO_BREAK_SPACE} from '@taiga-ui/cdk';
-import {NativeInputPO, PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, NativeInputPO, PageObject} from '@taiga-ui/testing';
 
 import {TuiInputRangeComponent} from '../input-range.component';
 import {TuiInputRangeModule} from '../input-range.module';
@@ -32,7 +31,7 @@ describe('InputRange', () => {
     })
     class TestComponent {
         @ViewChild(TuiInputRangeComponent, {static: true})
-        component: TuiInputRangeComponent;
+        component!: TuiInputRangeComponent;
 
         control = new FormControl([0, 1]);
         default = false;

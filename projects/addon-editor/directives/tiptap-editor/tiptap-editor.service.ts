@@ -4,7 +4,8 @@ import {Inject, Injectable} from '@angular/core';
 import {TuiEditor} from '@taiga-ui/addon-editor/abstract';
 import {TIPTAP_EDITOR} from '@taiga-ui/addon-editor/tokens';
 import {getMarkRange} from '@taiga-ui/addon-editor/utils';
-import type {Editor} from '@tiptap/core';
+import type {Editor, Range} from '@tiptap/core';
+import type {EditorState} from 'prosemirror-state';
 import {Observable} from 'rxjs';
 import {distinctUntilChanged, map, startWith} from 'rxjs/operators';
 
@@ -29,6 +30,10 @@ export class TuiTiptapEditorService extends TuiEditor {
 
     set editable(editable: boolean) {
         this.editor.setEditable(editable);
+    }
+
+    get state(): EditorState {
+        return this.editor.state;
     }
 
     editor!: Editor;
@@ -234,6 +239,14 @@ export class TuiTiptapEditorService extends TuiEditor {
         this.editor.chain().focus().setParagraph().run();
     }
 
+    setHardBreak() {
+        this.editor.chain().setHardBreak().run();
+    }
+
+    setTextSelection(value: number | Range) {
+        this.editor.commands.setTextSelection(value);
+    }
+
     toggleLink(href: string) {
         this.editor.chain().focus().toggleLink({href}).run();
     }
@@ -278,5 +291,9 @@ export class TuiTiptapEditorService extends TuiEditor {
         if (range) {
             this.editor.chain().setTextSelection(range).run();
         }
+    }
+
+    enter() {
+        this.editor.commands.enter();
     }
 }

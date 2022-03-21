@@ -27,7 +27,7 @@ import {PolymorpheusContent} from '@tinkoff/ng-polymorpheus';
 import {Observable} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 
-import {ButtonOptions, TUI_BUTTON_OPTIONS} from './button-options';
+import {TUI_BUTTON_OPTIONS, TuiButtonOptions} from './button-options';
 
 @Component({
     selector: 'button[tuiButton], button[tuiIconButton], a[tuiButton], a[tuiIconButton]',
@@ -45,7 +45,7 @@ import {ButtonOptions, TUI_BUTTON_OPTIONS} from './button-options';
 })
 export class TuiButtonComponent
     extends AbstractTuiInteractive
-    implements TuiFocusableElementAccessor, ButtonOptions
+    implements TuiFocusableElementAccessor, TuiButtonOptions
 {
     @Input()
     @HostBinding('attr.data-appearance')
@@ -65,7 +65,7 @@ export class TuiButtonComponent
     iconRight: PolymorpheusContent = '';
 
     @Input()
-    @HostBinding('attr.data-tui-host-shape')
+    @HostBinding('attr.data-shape')
     @tuiDefaultProp()
     shape = this.options.shape;
 
@@ -75,7 +75,7 @@ export class TuiButtonComponent
     showLoader = false;
 
     @Input()
-    @HostBinding('attr.data-tui-host-size')
+    @HostBinding('attr.data-size')
     @tuiDefaultProp()
     size = this.options.size;
 
@@ -87,7 +87,7 @@ export class TuiButtonComponent
         @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
         @Inject(TUI_TAKE_ONLY_TRUSTED_EVENTS)
         private readonly takeOnlyTrustedEvents: boolean,
-        @Inject(TUI_BUTTON_OPTIONS) private readonly options: ButtonOptions,
+        @Inject(TUI_BUTTON_OPTIONS) private readonly options: TuiButtonOptions,
     ) {
         super();
 

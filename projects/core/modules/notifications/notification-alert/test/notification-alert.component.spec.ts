@@ -6,9 +6,9 @@ import {
     TuiNotificationOptionsWithData,
 } from '@taiga-ui/core/interfaces';
 import {
-    NotificationTokenOptions,
     TUI_NOTIFICATION_DEFAULT_OPTIONS,
     TUI_NOTIFICATION_OPTIONS,
+    TuiNotificationDefaultOptions,
 } from '@taiga-ui/core/tokens';
 import {PageObject} from '@taiga-ui/testing';
 import {
@@ -88,13 +88,13 @@ describe('NotificationAlertComponent', () => {
     })
     class TestComponent {
         @ViewChild(TuiNotificationAlertComponent, {static: true})
-        component: TuiNotificationAlertComponent<string, string>;
+        component!: TuiNotificationAlertComponent<string, string>;
 
-        alert: NotificationAlert<string, string>;
+        alert!: NotificationAlert<string, string>;
 
         constructor(
             @Inject(TUI_NOTIFICATION_OPTIONS)
-            readonly options: NotificationTokenOptions,
+            readonly options: TuiNotificationDefaultOptions,
         ) {
             this.setAlert(content, {label});
         }

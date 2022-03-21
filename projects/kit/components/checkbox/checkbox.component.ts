@@ -19,7 +19,7 @@ import {
     tuiDefaultProp,
     TuiFocusableElementAccessor,
 } from '@taiga-ui/cdk';
-import {CheckboxOptions, TUI_CHECKBOX_OPTIONS, TuiSizeL} from '@taiga-ui/core';
+import {TUI_CHECKBOX_OPTIONS, TuiCheckboxOptions, TuiSizeL} from '@taiga-ui/core';
 
 @Component({
     selector: 'tui-checkbox',
@@ -41,7 +41,7 @@ export class TuiCheckboxComponent
     private readonly focusableElement?: ElementRef<HTMLInputElement>;
 
     @Input()
-    @HostBinding('attr.data-tui-host-size')
+    @HostBinding('attr.data-size')
     @tuiDefaultProp()
     size: TuiSizeL = this.options.size;
 
@@ -51,7 +51,7 @@ export class TuiCheckboxComponent
         @Inject(NgControl)
         control: NgControl | null,
         @Inject(TUI_CHECKBOX_OPTIONS)
-        private readonly options: CheckboxOptions,
+        private readonly options: TuiCheckboxOptions,
         @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
     ) {
         super(control, changeDetectorRef);
@@ -68,7 +68,7 @@ export class TuiCheckboxComponent
     }
 
     get computedFocusable(): boolean {
-        return !this.computedDisabled && !this.readOnly && this.focusable;
+        return this.interactive && this.focusable;
     }
 
     onChecked(checked: boolean) {

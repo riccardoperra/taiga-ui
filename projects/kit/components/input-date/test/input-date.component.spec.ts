@@ -16,8 +16,7 @@ import {
     TuiTextfieldControllerModule,
 } from '@taiga-ui/core';
 import {TUI_DATE_VALUE_TRANSFORMER} from '@taiga-ui/kit/tokens';
-import {NativeInputPO, PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, NativeInputPO, PageObject} from '@taiga-ui/testing';
 
 import {TuiInputDateComponent} from '../input-date.component';
 import {TuiInputDateModule} from '../input-date.module';
@@ -42,7 +41,7 @@ import {TuiInputDateModule} from '../input-date.module';
 })
 class TestComponent {
     @ViewChild(TuiInputDateComponent)
-    readonly component: TuiInputDateComponent;
+    readonly component!: TuiInputDateComponent;
 
     control = new FormControl(new TuiDay(2017, 2, 1));
 
@@ -463,6 +462,6 @@ function getCalendarCell(dayNumber: number): DebugElement | null {
     return (
         pageObject
             .getAllByAutomationId('tui-primitive-calendar__cell')
-            .find(el => +el.nativeElement.innerText.trim() === dayNumber) || null
+            .find(el => Number(el.nativeElement.innerText.trim()) === dayNumber) || null
     );
 }

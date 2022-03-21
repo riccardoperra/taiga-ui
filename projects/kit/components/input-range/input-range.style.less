@@ -21,16 +21,12 @@
     }
 }
 
-.zone {
-    border-radius: inherit;
-}
-
-.native-wrapper {
+.t-native-wrapper {
     .fullsize();
     display: flex;
 }
 
-.pluralize {
+.t-pluralize {
     display: flex;
     align-items: center;
     padding-right: 0.75rem;
@@ -39,7 +35,7 @@
     &_right {
         margin-left: -0.75rem;
 
-        :host[data-tui-host-size='l'] & {
+        :host[data-size='l'] & {
             padding-top: 1.25rem;
         }
 
@@ -53,7 +49,7 @@
     }
 }
 
-.native {
+.t-native {
     .clearinput();
     flex: 1;
     min-width: 0;
@@ -75,7 +71,7 @@
         user-select: none;
     }
 
-    :host[data-tui-host-size='l'] & {
+    :host[data-size='l'] & {
         padding: 1.25rem @padding 0;
     }
 
@@ -88,35 +84,35 @@
     }
 }
 
-.content {
+.t-content {
     display: flex;
     height: var(--tui-height-m);
     padding: 0 @padding;
     justify-content: space-between;
     align-items: center;
 
-    :host[data-tui-host-size='l'] & {
+    :host[data-size='l'] & {
         height: var(--tui-height-l);
         padding: 0 @padding;
     }
 
-    :host[data-tui-host-size='l']._disabled & {
+    :host[data-size='l']._disabled & {
         color: var(--tui-text-03);
     }
 
-    :host[data-tui-host-size='l'][data-mode='onDark']._disabled & {
+    :host[data-size='l'][data-mode='onDark']._disabled & {
         color: var(--tui-text-03-night);
     }
 }
 
-.placeholder {
+.t-placeholder {
     .textfield-placeholder();
     .fullsize();
     left: @padding;
     line-height: var(--tui-height-l);
 }
 
-.value {
+.t-value {
     visibility: hidden;
     overflow: hidden;
     padding-right: 0.75rem;
@@ -126,26 +122,26 @@
     }
 }
 
-.label {
+.t-label {
     display: flex;
     width: 50%;
 
-    :host[data-tui-host-size='l'] & {
+    :host[data-size='l'] & {
         padding-top: 1.25rem;
     }
 }
 
-.max {
+.t-max {
     text-align: right;
     flex: 1;
 
-    :host[data-tui-host-size='l'] & {
+    :host[data-size='l'] & {
         padding-top: 1.25rem;
         line-height: calc(var(--tui-height-l) - 1.25rem);
     }
 }
 
-.slider {
+.t-slider {
     position: absolute;
     top: 100%;
     left: 0;

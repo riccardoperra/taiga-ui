@@ -1,7 +1,7 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite} from '@taiga-ui/testing';
 
 import {TuiDesignModeDirective} from '../design-mode.directive';
 import {TuiDesignModeModule} from '../design-mode.module';
@@ -14,7 +14,7 @@ describe('TuiDesignMode directive', () => {
     })
     class TestComponent {
         @ViewChild(TuiDesignModeDirective, {read: ElementRef})
-        element: ElementRef<HTMLIFrameElement>;
+        element!: ElementRef<HTMLIFrameElement>;
 
         model = '';
     }

@@ -12,6 +12,13 @@
             heading="Async data loading"
             [content]="example1"
         >
+            <tui-notification class="tui-space_bottom-4 b-form">
+                If you need to set some attributes or listen to events on native
+                <code>input</code>
+                , you can put it inside with
+                <code>Textfield</code>
+                directive as shown below
+            </tui-notification>
             <tui-combo-box-example-1></tui-combo-box-example-1>
         </tui-doc-example>
 
@@ -43,6 +50,14 @@
             [content]="example5"
         >
             <tui-combo-box-example-5></tui-combo-box-example-5>
+        </tui-doc-example>
+
+        <tui-doc-example
+            id="options-stringify"
+            heading="Options (stringify)"
+            [content]="example6"
+        >
+            <tui-combo-box-example-6></tui-combo-box-example-6>
         </tui-doc-example>
     </ng-template>
 
@@ -148,7 +163,21 @@
                 documentationPropertyType="boolean"
                 [(documentationPropertyValue)]="strict"
             >
-                Value must be only item of items
+                Value must only be an item of suggestions&nbsp;
+                <code>&lt;T&gt;</code>
+
+                <p>
+                    <strong>
+                        When
+                        <code>false</code>
+                        , make sure your handlers, such as
+                        <code>stringify</code>
+                        can handle
+                        <code>string</code>
+                        value, as well as
+                        <code>&lt;T&gt;</code>
+                    </strong>
+                </p>
             </ng-template>
             <ng-template
                 i18n
@@ -199,7 +228,7 @@
 
                 <tui-doc-code
                     filename="myComponent.module.ts"
-                    [code]="exampleImportModule"
+                    [code]="exampleModule"
                 ></tui-doc-code>
 
                 <p i18n>
@@ -220,7 +249,7 @@
 
                 <tui-doc-code
                     filename="myComponent.component.ts"
-                    [code]="exampleDeclareForm"
+                    [code]="exampleForm"
                 ></tui-doc-code>
             </li>
 
@@ -229,7 +258,7 @@
 
                 <tui-doc-code
                     filename="myComponent.template.html"
-                    [code]="exampleInsertTemplate"
+                    [code]="exampleHtml"
                 ></tui-doc-code>
             </li>
         </ol>

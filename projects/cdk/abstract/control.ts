@@ -66,8 +66,7 @@ export abstract class AbstractTuiControl<T>
     @HostBinding('class._invalid')
     get computedInvalid(): boolean {
         return (
-            !this.readOnly &&
-            !this.disabled &&
+            this.interactive &&
             (this.pseudoInvalid !== null
                 ? this.pseudoInvalid
                 : this.touched && this.invalid)
@@ -98,6 +97,10 @@ export abstract class AbstractTuiControl<T>
         return this.safeNgControlData<boolean>(({disabled}) => disabled, false);
     }
 
+    get interactive(): boolean {
+        return !this.readOnly && !this.computedDisabled;
+    }
+
     get control(): AbstractControl | null {
         return this.safeNgControlData<AbstractControl | null>(
             ({control}) => control,
@@ -105,12 +108,12 @@ export abstract class AbstractTuiControl<T>
         );
     }
 
-    get computedName(): string | number | null {
-        return this.controlName;
+    get computedName(): string | null {
+        return this.controlName?.toString() ?? null;
     }
 
-    protected get controlName(): string | number | null {
-        return this.ngControl && this.ngControl.name;
+    protected get controlName(): string | null {
+        return this.ngControl?.name?.toString() ?? null;
     }
 
     private get rawValue(): T | undefined {
@@ -129,19 +132,13 @@ export abstract class AbstractTuiControl<T>
     }
 
     ngOnInit() {
-        if (
-            !this.ngControl ||
-            !this.ngControl.valueChanges ||
-            !this.ngControl.statusChanges
-        ) {
+        if (!this.ngControl?.valueChanges || !this.ngControl?.statusChanges) {
             return;
         }
 
         merge(this.ngControl.valueChanges, this.ngControl.statusChanges)
             .pipe(takeUntil(this.destroy$))
-            .subscribe(() => {
-                this.refreshLocalValue(this.safeCurrentValue);
-            });
+            .subscribe(() => this.refreshLocalValue(this.safeCurrentValue));
     }
 
     ngOnDestroy() {

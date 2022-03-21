@@ -15,7 +15,7 @@ export function tuiCreateAutoCorrectedNumberPipe(
     decimalLimit: number = 0,
     decimalSymbol: TuiDecimalSymbol = ',',
     thousandSymbol: string = CHAR_NO_BREAK_SPACE,
-    nativeInput?: HTMLInputElement,
+    nativeInput?: HTMLInputElement | null,
     allowNegative?: boolean,
 ): TuiTextMaskPipeHandler {
     tuiAssert.assert(Number.isInteger(decimalLimit));
@@ -88,7 +88,7 @@ function addDecimalSymbolIfNeeded(
     value: string,
     decimalSymbol: TuiDecimalSymbol = ',',
 ): string {
-    return value.indexOf(decimalSymbol) === -1 ? value + decimalSymbol : value;
+    return !value.includes(decimalSymbol) ? value + decimalSymbol : value;
 }
 
 function calculateSafariCaret(

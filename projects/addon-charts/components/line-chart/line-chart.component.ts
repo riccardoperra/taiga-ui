@@ -44,7 +44,7 @@ export class TuiLineChartComponent {
 
     @Input('value')
     @tuiDefaultProp()
-    set valueSetter(value: ReadonlyArray<TuiPoint>) {
+    set valueSetter(value: readonly TuiPoint[]) {
         this.value = value.filter(item => !item.some(isNaN));
     }
 
@@ -88,7 +88,7 @@ export class TuiLineChartComponent {
     @tuiDefaultProp()
     dots = false;
 
-    value: ReadonlyArray<TuiPoint> = [];
+    value: readonly TuiPoint[] = [];
 
     constructor(
         @Inject(TuiIdService) idService: TuiIdService,
@@ -96,7 +96,7 @@ export class TuiLineChartComponent {
         @Inject(Location) private readonly locationRef: Location,
         @Optional()
         @Inject(TuiLineChartHintDirective)
-        private readonly hintDirective: TuiLineChartHintDirective | null,
+        readonly hintDirective: TuiLineChartHintDirective | null,
     ) {
         this.autoIdString = idService.generate();
     }
@@ -107,7 +107,7 @@ export class TuiLineChartComponent {
     }
 
     get fillId(): string {
-        return 'tui-line-chart-' + this.autoIdString;
+        return `tui-line-chart-${this.autoIdString}`;
     }
 
     get fill(): string {
@@ -128,14 +128,8 @@ export class TuiLineChartComponent {
 
     get fillD(): string {
         return this.value.length
-            ? this.d + `V ${this.y} H ${this.value[0][0]} V ${this.value[0][1]}`
+            ? `${this.d}V ${this.y} H ${this.value[0][0]} V ${this.value[0][1]}`
             : this.d;
-    }
-
-    get computedHint():
-        | PolymorpheusContent<TuiContextWithImplicit<TuiPoint>>
-        | PolymorpheusContent<TuiContextWithImplicit<ReadonlyArray<TuiPoint>>> {
-        return this.hintDirective ? this.hintDirective.hint : this.hintContent;
     }
 
     get isFocusable(): boolean {
@@ -143,7 +137,12 @@ export class TuiLineChartComponent {
     }
 
     get hasHints(): boolean {
-        return !!this.xStringify || !!this.yStringify || !!this.computedHint;
+        return (
+            !!this.xStringify ||
+            !!this.yStringify ||
+            !!this.hintDirective?.hint ||
+            !!this.hintContent
+        );
     }
 
     @HostListener('mouseleave')
@@ -171,14 +170,12 @@ export class TuiLineChartComponent {
         return `${this.autoIdString}_${index}`;
     }
 
-    getContentContext(
-        $implicit: TuiPoint,
-    ):
-        | TuiContextWithImplicit<TuiPoint>
-        | TuiContextWithImplicit<ReadonlyArray<TuiPoint>> {
-        return this.hintDirective
-            ? this.hintDirective.getContext(this.value.indexOf($implicit), this)
-            : {$implicit};
+    getContentContext($implicit: TuiPoint): TuiContextWithImplicit<readonly TuiPoint[]> {
+        return (
+            this.hintDirective?.getContext(this.value.indexOf($implicit), this) || {
+                $implicit: [],
+            }
+        );
     }
 
     getHovered(hovered: number): TuiPoint | null {
@@ -215,7 +212,7 @@ export class TuiLineChartComponent {
     }
 
     @tuiPure
-    private getD(value: ReadonlyArray<TuiPoint>, smoothingFactor: number): string {
+    private getD(value: readonly TuiPoint[], smoothingFactor: number): string {
         return value.reduce(
             (d, point, index) =>
                 index ? `${d} ${draw(value, index, smoothingFactor)}` : `M ${point}`,

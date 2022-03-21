@@ -1,9 +1,11 @@
+import {DOCUMENT} from '@angular/common';
 import {
     ChangeDetectionStrategy,
     Component,
     ElementRef,
     Inject,
     Optional,
+    Type,
 } from '@angular/core';
 import {TUI_DIALOGS, TUI_IS_MOBILE, tuiAssert} from '@taiga-ui/cdk';
 import {VERSION} from '@taiga-ui/core/constants';
@@ -13,6 +15,7 @@ import {
     TUI_ANIMATIONS_DURATION,
     TUI_ASSERT_ENABLED,
     TUI_IS_MOBILE_RES,
+    TUI_THEME,
 } from '@taiga-ui/core/tokens';
 import {merge, Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
@@ -31,7 +34,7 @@ import {map} from 'rxjs/operators';
     },
 })
 export class TuiRootComponent {
-    readonly scrollbars$ =
+    readonly scrollbars$: Observable<boolean> =
         this.dialogs && !this.isMobile
             ? merge(...this.dialogs).pipe(map(({length}) => !length))
             : of(!this.isMobile);
@@ -44,11 +47,14 @@ export class TuiRootComponent {
         readonly dialogs: readonly Observable<readonly unknown[]>[] | null,
         @Optional()
         @Inject(TuiNotificationsHostComponent)
-        readonly notificationsHost: TuiNotificationsHostComponent,
+        readonly notificationsHost: Type<unknown>,
         @Inject(TUI_IS_MOBILE) private readonly isMobile: boolean,
         @Inject(TUI_ASSERT_ENABLED) enabled: boolean,
         @Inject(TUI_IS_MOBILE_RES) readonly isMobileRes$: Observable<boolean>,
+        @Inject(DOCUMENT) {body}: Document,
+        @Inject(TUI_THEME) theme: string,
     ) {
         tuiAssert.enabled = enabled;
+        body.setAttribute('data-tui-theme', theme.toLowerCase());
     }
 }

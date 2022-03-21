@@ -16,8 +16,7 @@ import {
     TuiTextfieldControllerModule,
 } from '@taiga-ui/core';
 import {TuiDataListWrapperModule} from '@taiga-ui/kit/components';
-import {NativeInputPO, PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, NativeInputPO, PageObject} from '@taiga-ui/testing';
 
 import {TuiComboBoxComponent} from '../combo-box.component';
 import {TuiComboBoxModule} from '../combo-box.module';
@@ -201,7 +200,7 @@ describe('ComboBox', () => {
 
         describe('dropdown', () => {
             it('empty value opens dropdown', () => {
-                testComponent.component.onInput('');
+                testComponent.component.onValueChange('');
                 fixture.detectChanges();
                 expect(testComponent.component.open).toEqual(true);
             });

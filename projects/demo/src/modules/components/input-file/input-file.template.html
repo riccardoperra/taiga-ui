@@ -1,9 +1,19 @@
-<tui-doc-page header="InputFile" package="KIT" type="components">
+<tui-doc-page header="InputFile" package="KIT" type="components" deprecated>
     <ng-template pageTab>
         <p i18n>
             An input for upload one or several files. It uses native input file
             abilities.
         </p>
+
+        <tui-notification status="error">
+            <strong>Deprecated</strong>
+            . Use
+            <code>InputFiles</code>
+            from
+            <a tuiLink routerLink="/components/input-files">
+                TuiInputFilesModule
+            </a>
+        </tui-notification>
 
         <tui-doc-example
             id="single"
@@ -167,7 +177,7 @@
 
                 <tui-doc-code
                     filename="myComponent.module.ts"
-                    [code]="exampleImportModule"
+                    [code]="exampleModule"
                 ></tui-doc-code>
             </li>
 
@@ -176,7 +186,7 @@
 
                 <tui-doc-code
                     filename="myComponent.template.html"
-                    [code]="exampleInsertTemplate"
+                    [code]="exampleHtml"
                 ></tui-doc-code>
             </li>
         </ol>

@@ -1,6 +1,6 @@
 <tui-hosted-dropdown
     class="t-hosted"
-    [canOpen]="canOpen"
+    [canOpen]="interactive"
     [content]="datalist || ''"
     (tuiActiveZoneChange)="onActiveZone($event)"
 >
@@ -9,7 +9,8 @@
         class="t-textfield"
         [editable]="false"
         [pseudoFocused]="computedFocused"
-        [pseudoHovered]="computedHovered"
+        [pseudoHovered]="pseudoHovered"
+        [pseudoPressed]="pseudoPressed"
         [invalid]="computedInvalid"
         [nativeId]="nativeId"
         [readOnly]="readOnly"
@@ -23,6 +24,7 @@
         (keydown.backspace.prevent)="onKeyDownDelete()"
     >
         <ng-content></ng-content>
+        <ng-content select="input" ngProjectAs="input"></ng-content>
         <div
             *ngIf="value !== null"
             polymorpheus-outlet

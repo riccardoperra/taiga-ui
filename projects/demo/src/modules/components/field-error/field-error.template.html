@@ -1,4 +1,4 @@
-<tui-doc-page header="FieldError" package="KIT" type="components">
+<tui-doc-page header="FieldError" package="KIT" type="components" deprecated>
     <ng-template pageTab>
         <p i18n>
             <code>FieldError</code>
@@ -8,6 +8,15 @@
             </a>
             .
         </p>
+        <tui-notification status="error">
+            <strong>Deprecated.</strong>
+            Use
+            <code>tuiFieldError</code>
+            pipe from
+            <a tuiLink routerLink="/pipes/field-error">
+                TuiFieldErrorPipeModule
+            </a>
+        </tui-notification>
 
         <tui-doc-example
             id="base"
@@ -66,7 +75,7 @@
 
                 <tui-doc-code
                     filename="myComponent.module.ts"
-                    [code]="exampleImportModule"
+                    [code]="exampleModule"
                 ></tui-doc-code>
             </li>
 
@@ -75,7 +84,7 @@
 
                 <tui-doc-code
                     filename="myComponent.template.html"
-                    [code]="exampleInsertTemplate"
+                    [code]="exampleHtml"
                 ></tui-doc-code>
             </li>
         </ol>

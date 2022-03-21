@@ -15,9 +15,9 @@ import {
 } from '@taiga-ui/cdk';
 import {TuiNamedDay} from '@taiga-ui/kit';
 
-import {default as exampleDeclareForm} from '!!raw-loader!./examples/import/declare-form.txt';
-import {default as exampleImportModule} from '!!raw-loader!./examples/import/import-module.txt';
-import {default as exampleInsertTemplate} from '!!raw-loader!./examples/import/insert-template.txt';
+import {default as exampleForm} from '!!raw-loader!./examples/import/declare-form.txt';
+import {default as exampleModule} from '!!raw-loader!./examples/import/import-module.txt';
+import {default as exampleHtml} from '!!raw-loader!./examples/import/insert-template.txt';
 
 import {AbstractExampleTuiControl} from '../abstract/control';
 import {ABSTRACT_PROPS_ACCESSOR} from '../abstract/inherited-documentation/abstract-props-accessor';
@@ -36,9 +36,9 @@ import {ABSTRACT_PROPS_ACCESSOR} from '../abstract/inherited-documentation/abstr
 export class ExampleTuiInputDateTimeComponent extends AbstractExampleTuiControl {
     private readonly today = TuiDay.currentLocal();
 
-    readonly exampleDeclareForm = exampleDeclareForm;
-    readonly exampleImportModule = exampleImportModule;
-    readonly exampleInsertTemplate = exampleInsertTemplate;
+    readonly exampleForm = exampleForm;
+    readonly exampleModule = exampleModule;
+    readonly exampleHtml = exampleHtml;
 
     readonly example1: TuiDocExample = {
         TypeScript: import('!!raw-loader!./examples/1/index.ts'),
@@ -66,7 +66,7 @@ export class ExampleTuiInputDateTimeComponent extends AbstractExampleTuiControl 
         new TuiDay(2017, 2, 5),
         new TuiDay(1900, 0, 1),
         [this.today.append({day: -1}), new TuiTime(12, 20)],
-    ];
+    ] as const;
 
     min = this.minVariants[0];
 
@@ -76,7 +76,7 @@ export class ExampleTuiInputDateTimeComponent extends AbstractExampleTuiControl 
         new TuiDay(2020, 2, 5),
         new TuiDay(2300, 0, 1),
         [this.today.append({day: +1}), new TuiTime(16, 20)],
-    ];
+    ] as const;
 
     max = this.maxVariants[0];
 

@@ -1,29 +1,30 @@
 import {
     AfterViewInit,
-    ChangeDetectorRef,
     Directive,
     ElementRef,
     Inject,
     Input,
+    NgZone,
     Optional,
     Renderer2,
     Self,
-    ViewContainerRef,
 } from '@angular/core';
 import {ANIMATION_FRAME} from '@ng-web-apis/common';
 import {POLLING_TIME} from '@taiga-ui/cdk/constants';
-import {TuiFocusableElementAccessor} from '@taiga-ui/cdk/interfaces';
+import {
+    TuiFocusableElementAccessor,
+    TuiNativeFocusableElement,
+} from '@taiga-ui/cdk/interfaces';
 import {TUI_FOCUSABLE_ITEM_ACCESSOR, TUI_IS_IOS} from '@taiga-ui/cdk/tokens';
-import {getClosestElement} from '@taiga-ui/cdk/utils/dom';
 import {setNativeFocused} from '@taiga-ui/cdk/utils/focus';
 import {Observable, race, timer} from 'rxjs';
-import {filter, map, take, throttleTime} from 'rxjs/operators';
+import {map, skipWhile, take, throttleTime} from 'rxjs/operators';
 
-const IOS_TIMEOUT = 1000;
+const TIMEOUT = 1000;
 const NG_ANIMATION_SELECTOR = '.ng-animating';
 
-// @bad TODO: Consider removing iOS hacks
 // TODO: in 3.0 change input name to tuiAutoFocus and handle empty string
+// TODO: refactor on this whole thing in 3.0
 @Directive({
     selector: '[tuiAutoFocus]',
 })
@@ -32,19 +33,18 @@ export class TuiAutoFocusDirective implements AfterViewInit {
     autoFocus = true;
 
     constructor(
-        @Inject(ChangeDetectorRef)
-        private readonly changeDetectorRef: ChangeDetectorRef,
-        @Inject(ElementRef)
-        private readonly elementRef: ElementRef<HTMLElement>,
         @Optional()
         @Self()
         @Inject(TUI_FOCUSABLE_ITEM_ACCESSOR)
         private readonly tuiFocusableComponent: TuiFocusableElementAccessor | null,
         @Inject(TUI_IS_IOS) private readonly isIos: boolean,
-        @Inject(Renderer2) private readonly renderer: Renderer2,
-        @Inject(ViewContainerRef)
-        private readonly viewContainerRef: ViewContainerRef,
         @Inject(ANIMATION_FRAME) private readonly animationFrame$: Observable<number>,
+        @Inject(NgZone)
+        private readonly ngZone: NgZone,
+        @Inject(ElementRef)
+        private readonly elementRef: ElementRef<HTMLElement>,
+        @Inject(Renderer2)
+        private readonly renderer: Renderer2,
     ) {}
 
     ngAfterViewInit() {
@@ -52,54 +52,75 @@ export class TuiAutoFocusDirective implements AfterViewInit {
             return;
         }
 
-        const element =
-            this.tuiFocusableComponent === null
-                ? this.elementRef.nativeElement
-                : this.tuiFocusableComponent.nativeFocusableElement;
+        if (this.isTextFieldElement) {
+            if (this.isIos) {
+                this.ngZone.runOutsideAngular(() => this.iosWebkitAutofocus());
+            } else {
+                race(
+                    timer(TIMEOUT),
+                    this.animationFrame$.pipe(
+                        throttleTime(POLLING_TIME),
+                        map(() => this.element.closest(NG_ANIMATION_SELECTOR)),
+                        skipWhile(Boolean),
+                        take(1),
+                    ),
+                ).subscribe(() => setNativeFocused(this.element));
+            }
 
-        // TODO: iframe warning
-        if (!(element instanceof HTMLElement)) {
             return;
         }
 
-        if (!this.isIos) {
-            setTimeout(() => {
-                setNativeFocused(element);
-                this.changeDetectorRef.markForCheck();
-            });
-
-            return;
-        }
-
-        this.veryVerySadIosFix(element);
+        setNativeFocused(this.element);
     }
 
-    private veryVerySadIosFix(element: HTMLElement) {
-        const {nativeElement} = this.viewContainerRef.element;
-        const decoy: HTMLElement = this.renderer.createElement('input');
+    private get element(): TuiNativeFocusableElement {
+        return (
+            this.tuiFocusableComponent?.nativeFocusableElement ||
+            this.elementRef.nativeElement
+        );
+    }
 
-        decoy.style.position = 'absolute';
-        decoy.style.opacity = '0';
-        decoy.style.height = '0';
+    private get isTextFieldElement(): boolean {
+        return this.element.matches('input, textarea');
+    }
 
-        this.renderer.setAttribute(decoy, 'readonly', 'readonly');
-        this.renderer.appendChild(nativeElement, decoy);
-        setNativeFocused(decoy);
+    private iosWebkitAutofocus() {
+        const fakeInput: HTMLElement = this.renderer.createElement('input');
 
-        race<unknown>(
-            timer(IOS_TIMEOUT),
-            this.animationFrame$.pipe(
-                throttleTime(POLLING_TIME),
-                map(() => getClosestElement(element, NG_ANIMATION_SELECTOR)),
-                filter(element => !element),
-                take(1),
-            ),
-        ).subscribe(() => {
+        fakeInput.style.position = 'absolute';
+        fakeInput.style.opacity = '0';
+        fakeInput.style.height = '0';
+
+        const blurHandler = () => setNativeFocused(fakeInput);
+        const focusHandler = () => {
             setTimeout(() => {
-                setNativeFocused(element);
-                this.changeDetectorRef.markForCheck();
-                this.renderer.removeChild(nativeElement, decoy);
+                setNativeFocused(this.element);
+
+                /**
+                 * @note:
+                 * We can't remove the element immediately, because it breaks flow
+                 */
+                setTimeout(() => {
+                    fakeInput.removeEventListener('blur', blurHandler);
+                    fakeInput.removeEventListener('focus', focusHandler);
+                    fakeInput.remove();
+                });
             });
-        });
+        };
+
+        /**
+         * @note: ping-pong eager strategy hack
+         * After creating an element and bringing it into DOM,
+         * the browser automatically focuses on the invisible element.
+         * And then, after focus is triggered, we try to focus on target element, and if we managed to refocus,
+         * then we try to focus again on an invisible element, so that the keyboard slowly appears.
+         * This ping pong allows the keyboard to not overlap the modal window.
+         */
+        fakeInput.addEventListener('blur', blurHandler, {once: true});
+        fakeInput.addEventListener('focus', focusHandler);
+
+        this.element.parentElement?.appendChild(fakeInput);
+
+        setNativeFocused(fakeInput);
     }
 }

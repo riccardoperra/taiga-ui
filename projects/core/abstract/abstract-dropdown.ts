@@ -11,6 +11,7 @@ import {
 import {
     TuiActiveZoneDirective,
     tuiDefaultProp,
+    TuiNativeFocusableElement,
     TuiPortalService,
     tuiPure,
 } from '@taiga-ui/cdk';
@@ -39,7 +40,7 @@ export abstract class AbstractTuiDropdown
 
     @Input('tuiDropdownHost')
     @tuiDefaultProp()
-    tuiDropdownHost: HTMLElement | null = null;
+    tuiDropdownHost: TuiNativeFocusableElement | HTMLElement | null = null;
 
     @Input('tuiDropdownMinHeight')
     @tuiDefaultProp()
@@ -67,7 +68,7 @@ export abstract class AbstractTuiDropdown
 
     dropdownBoxRef: ComponentRef<TuiDropdownBoxComponent> | null = null;
 
-    constructor(
+    protected constructor(
         private readonly componentFactoryResolver: ComponentFactoryResolver,
         private readonly injector: Injector,
         private readonly portalService: TuiPortalService,
@@ -91,13 +92,22 @@ export abstract class AbstractTuiDropdown
         return this.elementRef.nativeElement.getBoundingClientRect();
     }
 
-    get host(): HTMLElement {
+    get host(): TuiNativeFocusableElement | HTMLElement {
         return this.tuiDropdownHost || this.elementRef.nativeElement;
     }
 
     @tuiPure
     get fixed(): boolean {
         return checkFixedPosition(this.elementRef.nativeElement);
+    }
+
+    @tuiPure
+    protected toggleDropdown(value: boolean) {
+        if (value) {
+            this.openDropdownBox();
+        } else {
+            this.closeDropdownBox();
+        }
     }
 
     protected openDropdownBox() {

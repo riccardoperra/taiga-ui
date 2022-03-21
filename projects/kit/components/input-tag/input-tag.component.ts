@@ -54,6 +54,7 @@ import {
     TuiSizeS,
     TuiTextfieldController,
 } from '@taiga-ui/core';
+import {TuiStringifiableItem} from '@taiga-ui/kit/classes';
 import {ALLOWED_SPACE_REGEXP} from '@taiga-ui/kit/components/tag';
 import {FIXED_DROPDOWN_CONTROLLER_PROVIDER} from '@taiga-ui/kit/providers';
 import {TUI_TAG_STATUS} from '@taiga-ui/kit/tokens';
@@ -62,7 +63,9 @@ import {PolymorpheusContent} from '@tinkoff/ng-polymorpheus';
 import {merge, Subject} from 'rxjs';
 import {filter, map, mapTo, switchMap, takeUntil} from 'rxjs/operators';
 
-const EVENT_Y_TO_X_COEFFICENT = 3;
+import {TUI_INPUT_TAG_OPTIONS, TuiInputTagOptions} from './input-tag-options';
+
+const EVENT_Y_TO_X_COEFFICIENT = 3;
 
 @Component({
     selector: 'tui-input-tag',
@@ -88,7 +91,7 @@ export class TuiInputTagComponent
     implements TuiFocusableElementAccessor, TuiDataListHost<string>
 {
     @ViewChild(TuiHostedDropdownComponent)
-    private readonly dropdown?: TuiHostedDropdownComponent;
+    private readonly hostedDropdown?: TuiHostedDropdownComponent;
 
     @ViewChild('focusableElement')
     private readonly focusableElement?: ElementRef<HTMLInputElement>;
@@ -108,9 +111,14 @@ export class TuiInputTagComponent
     private readonly scrollToStart$ = new Subject<void>();
     private readonly scrollToEnd$ = new Subject<void>();
 
+    // TODO: Remove in 3.0
     @Input()
     @tuiDefaultProp()
     allowSpaces = true;
+
+    @Input()
+    @tuiDefaultProp()
+    separator: string | RegExp = this.options.separator;
 
     @Input()
     @tuiDefaultProp()
@@ -143,7 +151,12 @@ export class TuiInputTagComponent
 
     @Input()
     @tuiDefaultProp()
-    disabledItemHandler: TuiBooleanHandler<string> = ALWAYS_FALSE_HANDLER;
+    uniqueTags = this.options.uniqueTags;
+
+    @Input()
+    @tuiDefaultProp()
+    disabledItemHandler: TuiBooleanHandler<string | TuiStringifiableItem<any>> =
+        ALWAYS_FALSE_HANDLER;
 
     @Input('pseudoFocused')
     set pseudoFocusedSetter(value: boolean | null) {
@@ -187,6 +200,11 @@ export class TuiInputTagComponent
         readonly hintController: TuiHintControllerDirective,
         @Inject(TUI_TEXTFIELD_WATCHED_CONTROLLER)
         readonly controller: TuiTextfieldController,
+        @Inject(TUI_INPUT_TAG_OPTIONS)
+        private readonly options: TuiInputTagOptions,
+        @Optional()
+        @Inject(TuiHostedDropdownComponent)
+        private readonly parentHostedDropdown?: TuiHostedDropdownComponent,
     ) {
         super(control, changeDetectorRef);
     }
@@ -200,11 +218,11 @@ export class TuiInputTagComponent
     get focused(): boolean {
         return (
             isNativeFocusedIn(this.elementRef.nativeElement) ||
-            (!!this.dropdown && this.dropdown.focused)
+            !!this.hostedDropdown?.focused
         );
     }
 
-    @HostBinding('attr.data-tui-host-size')
+    @HostBinding('attr.data-size')
     get size(): TuiSizeL | TuiSizeS {
         return this.controller.size;
     }
@@ -217,9 +235,7 @@ export class TuiInputTagComponent
     }
 
     get hasCleaner(): boolean {
-        return (
-            this.controller.cleaner && this.hasValue && !this.disabled && !this.readOnly
-        );
+        return this.controller.cleaner && this.hasValue && this.interactive;
     }
 
     get hasNativeValue(): boolean {
@@ -231,7 +247,10 @@ export class TuiInputTagComponent
     }
 
     get hasPlaceholder(): boolean {
-        return !this.labelOutside || (!this.hasValue && !this.hasExampleText);
+        return (
+            !this.labelOutside ||
+            (!this.hasValue && (!this.hasExampleText || this.inputHidden))
+        );
     }
 
     get placeholderRaised(): boolean {
@@ -271,7 +290,7 @@ export class TuiInputTagComponent
     }
 
     get canOpen(): boolean {
-        return !this.computedDisabled && !this.readOnly && !!this.datalist;
+        return this.interactive && !!this.datalist;
     }
 
     getLeftContent(tag: string): PolymorpheusContent {
@@ -284,6 +303,7 @@ export class TuiInputTagComponent
         this.updateSearch('');
         this.clear();
         this.focusInput();
+        this.parentHostedDropdown?.updateOpen(true);
     }
 
     onActiveZone(active: boolean) {
@@ -352,15 +372,15 @@ export class TuiInputTagComponent
         }
     }
 
-    onTagEdited(value: string, editedTag: string) {
+    onTagEdited(value: string, index: number) {
         this.focusInput();
         this.updateValue(
             this.value
-                .map(tag =>
-                    tag !== editedTag
+                .map((tag, tagIndex) =>
+                    tagIndex !== index
                         ? tag
                         : value
-                              .split(',')
+                              .split(this.separator)
                               .map(tag => tag.trim())
                               .filter(Boolean),
                 )
@@ -381,7 +401,7 @@ export class TuiInputTagComponent
 
     onInput(value: string) {
         const array = this.allowSpaces
-            ? value.split(',')
+            ? value.split(this.separator)
             : value.split(ALLOWED_SPACE_REGEXP);
         const tags = array
             .map(item => item.trim())
@@ -413,7 +433,10 @@ export class TuiInputTagComponent
         super.updateValue(
             value
                 .reverse()
-                .filter(item => !!item && !seen.has(item) && seen.add(item))
+                .filter(
+                    item =>
+                        !this.uniqueTags || (!!item && !seen.has(item) && seen.add(item)),
+                )
                 .reverse(),
         );
     }
@@ -449,7 +472,7 @@ export class TuiInputTagComponent
             filter(event => event.deltaX === 0 && this.shouldScroll(nativeElement)),
             preventDefault(),
             map(({deltaY}) =>
-                Math.max(nativeElement.scrollLeft + deltaY * EVENT_Y_TO_X_COEFFICENT, 0),
+                Math.max(nativeElement.scrollLeft + deltaY * EVENT_Y_TO_X_COEFFICIENT, 0),
             ),
         );
         const start$ = this.scrollToStart$.pipe(mapTo(0));

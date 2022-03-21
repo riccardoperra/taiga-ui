@@ -39,9 +39,10 @@ import {
 } from '@taiga-ui/core';
 import {TUI_PLUS_MINUS_TEXTS} from '@taiga-ui/kit/tokens';
 import {PolymorpheusContent} from '@tinkoff/ng-polymorpheus';
+import {TextMaskConfig} from 'angular2-text-mask';
 import {Observable} from 'rxjs';
 
-import {InputCountOptions, TUI_INPUT_COUNT_OPTIONS} from './input-count-options';
+import {TUI_INPUT_COUNT_OPTIONS, TuiInputCountOptions} from './input-count-options';
 
 // @dynamic
 @Component({
@@ -52,6 +53,10 @@ import {InputCountOptions, TUI_INPUT_COUNT_OPTIONS} from './input-count-options'
     providers: [
         {
             provide: TUI_FOCUSABLE_ITEM_ACCESSOR,
+            useExisting: forwardRef(() => TuiInputCountComponent),
+        },
+        {
+            provide: AbstractTuiControl,
             useExisting: forwardRef(() => TuiInputCountComponent),
         },
     ],
@@ -101,7 +106,7 @@ export class TuiInputCountComponent
         readonly minusTexts$: Observable<[string, string]>,
         @Inject(TUI_IS_MOBILE) private readonly isMobile: boolean,
         @Inject(TUI_INPUT_COUNT_OPTIONS)
-        readonly options: InputCountOptions,
+        readonly options: TuiInputCountOptions,
         @Inject(TUI_NUMBER_FORMAT)
         private readonly numberFormat: NumberFormatSettings,
     ) {
@@ -109,7 +114,7 @@ export class TuiInputCountComponent
     }
 
     @tuiPure
-    getMask(allowNegative: boolean): TuiTextMaskOptions {
+    getMask(allowNegative: boolean): TextMaskConfig {
         return {
             mask: tuiCreateNumberMask({
                 allowNegative,
@@ -117,7 +122,7 @@ export class TuiInputCountComponent
                 thousandSymbol: this.numberFormat.thousandSeparator,
             }),
             guide: false,
-        };
+        } as TuiTextMaskOptions as unknown as TextMaskConfig;
     }
 
     // TODO: Remove in v.3
@@ -140,7 +145,7 @@ export class TuiInputCountComponent
             : this.primitiveTextfield.nativeFocusableElement;
     }
 
-    @HostBinding('attr.data-tui-host-size')
+    @HostBinding('attr.data-size')
     get size(): TuiSizeL | TuiSizeS {
         return this.textfieldSize.size;
     }
@@ -154,23 +159,15 @@ export class TuiInputCountComponent
     }
 
     get computedValue(): string {
-        return this.formatNumber(this.value);
+        return this.focused ? this.nativeValue : this.formatNumber(this.value);
     }
 
     get minusButtonDisabled(): boolean {
-        return (
-            this.disabled ||
-            this.readOnly ||
-            (isPresent(this.value) && this.value <= this.min)
-        );
+        return !this.interactive || (isPresent(this.value) && this.value <= this.min);
     }
 
     get plusButtonDisabled(): boolean {
-        return (
-            this.disabled ||
-            this.readOnly ||
-            (isPresent(this.value) && this.value >= this.max)
-        );
+        return !this.interactive || (isPresent(this.value) && this.value >= this.max);
     }
 
     onButtonMouseDown(event: MouseEvent, disabled: boolean = false) {

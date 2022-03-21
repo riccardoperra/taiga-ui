@@ -3,7 +3,6 @@ import {
     ChangeDetectorRef,
     Component,
     ContentChild,
-    forwardRef,
     Inject,
     Input,
     Optional,
@@ -16,52 +15,37 @@ import {
     AbstractTuiNullableControl,
     isNativeFocused,
     setNativeFocused,
-    TUI_DEFAULT_IDENTITY_MATCHER,
-    TUI_FOCUSABLE_ITEM_ACCESSOR,
+    TuiActiveZoneDirective,
+    TuiContextWithImplicit,
     tuiDefaultProp,
     TuiFocusableElementAccessor,
-    TuiIdentityMatcher,
     tuiPure,
 } from '@taiga-ui/cdk';
 import {
-    TUI_DATA_LIST_HOST,
-    TUI_OPTION_CONTENT,
     TUI_TEXTFIELD_CLEANER,
     TuiDataListDirective,
     TuiDataListHost,
     TuiHostedDropdownComponent,
     TuiPrimitiveTextfieldComponent,
+    TuiSizeL,
+    TuiSizeM,
+    TuiSizeS,
     TuiTextfieldCleanerDirective,
     TuiValueContentContext,
 } from '@taiga-ui/core';
-import {TUI_ARROW} from '@taiga-ui/kit/components/arrow';
-import {TUI_SELECT_OPTION} from '@taiga-ui/kit/components/select-option';
-import {FIXED_DROPDOWN_CONTROLLER_PROVIDER} from '@taiga-ui/kit/providers';
+import {TUI_ARROW_MODE, TuiArrowMode} from '@taiga-ui/kit/components/arrow';
+import {TUI_ITEMS_HANDLERS, TuiItemsHandlers} from '@taiga-ui/kit/tokens';
 import {PolymorpheusContent} from '@tinkoff/ng-polymorpheus';
 
-// TODO: remove in ivy compilation
-export const SELECT_OPTION: unknown = TUI_SELECT_OPTION;
+import {TUI_SELECT_PROVIDERS} from './select.providers';
+import {TUI_SELECT_OPTIONS, TuiSelectOptions} from './select-options';
 
 @Component({
     selector: 'tui-select',
     templateUrl: './select.template.html',
     styleUrls: ['./select.style.less'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [
-        {
-            provide: TUI_FOCUSABLE_ITEM_ACCESSOR,
-            useExisting: forwardRef(() => TuiSelectComponent),
-        },
-        {
-            provide: TUI_DATA_LIST_HOST,
-            useExisting: forwardRef(() => TuiSelectComponent),
-        },
-        {
-            provide: TUI_OPTION_CONTENT,
-            useValue: SELECT_OPTION,
-        },
-        FIXED_DROPDOWN_CONTROLLER_PROVIDER,
-    ],
+    providers: TUI_SELECT_PROVIDERS,
 })
 export class TuiSelectComponent<T>
     extends AbstractTuiNullableControl<T>
@@ -75,14 +59,21 @@ export class TuiSelectComponent<T>
 
     @Input()
     @tuiDefaultProp()
-    identityMatcher: TuiIdentityMatcher<T | string> = TUI_DEFAULT_IDENTITY_MATCHER;
+    stringify: TuiItemsHandlers<T>['stringify'] = this.itemsHandlers.stringify;
 
     @Input()
     @tuiDefaultProp()
-    valueContent: PolymorpheusContent<TuiValueContentContext<T>> = '';
+    identityMatcher: TuiItemsHandlers<T>['identityMatcher'] =
+        this.itemsHandlers.identityMatcher;
+
+    @Input()
+    @tuiDefaultProp()
+    valueContent: TuiSelectOptions<T>['valueContent'] = this.options.valueContent;
 
     @ContentChild(TuiDataListDirective, {read: TemplateRef})
-    readonly datalist: PolymorpheusContent = '';
+    readonly datalist: PolymorpheusContent<
+        TuiContextWithImplicit<TuiActiveZoneDirective>
+    > = '';
 
     constructor(
         @Optional()
@@ -92,12 +83,20 @@ export class TuiSelectComponent<T>
         @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
         @Inject(TUI_TEXTFIELD_CLEANER)
         private readonly textfieldCleaner: TuiTextfieldCleanerDirective,
+        @Inject(TUI_ARROW_MODE)
+        private readonly arrowMode: TuiArrowMode,
+        @Inject(TUI_ITEMS_HANDLERS)
+        private readonly itemsHandlers: TuiItemsHandlers<T>,
+        @Inject(TUI_SELECT_OPTIONS)
+        private readonly options: TuiSelectOptions<T>,
     ) {
         super(control, changeDetectorRef);
     }
 
-    get arrow(): PolymorpheusContent {
-        return this.disabled || this.readOnly ? '' : TUI_ARROW;
+    get arrow(): PolymorpheusContent<
+        TuiContextWithImplicit<TuiSizeS | TuiSizeM | TuiSizeL>
+    > {
+        return !this.interactive ? this.arrowMode.disabled : this.arrowMode.interactive;
     }
 
     get nativeFocusableElement(): HTMLInputElement | null {
@@ -112,15 +111,11 @@ export class TuiSelectComponent<T>
     }
 
     get computedValue(): string {
-        return this.value === null ? '' : String(this.value) || ' ';
+        return this.value === null ? '' : this.stringify(this.value) || ' ';
     }
 
     get computedContent(): PolymorpheusContent<TuiValueContentContext<T>> {
         return this.valueContent || this.computedValue;
-    }
-
-    get canOpen(): boolean {
-        return !this.computedDisabled && !this.readOnly;
     }
 
     @tuiPure
@@ -154,10 +149,7 @@ export class TuiSelectComponent<T>
     handleOption(option: T) {
         this.focusInput();
         this.updateValue(option);
-
-        if (this.hostedDropdown) {
-            this.hostedDropdown.updateOpen(false);
-        }
+        this.hostedDropdown?.updateOpen(false);
     }
 
     private focusInput(preventScroll: boolean = false) {

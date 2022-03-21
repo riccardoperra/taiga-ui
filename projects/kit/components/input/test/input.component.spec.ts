@@ -12,8 +12,13 @@ import {
     TuiTextfieldControllerModule,
 } from '@taiga-ui/core';
 import {TuiDataListWrapperModule} from '@taiga-ui/kit/components';
-import {activeText, dispatchOnActive, NativeInputPO, PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {
+    activeText,
+    configureTestSuite,
+    dispatchOnActive,
+    NativeInputPO,
+    PageObject,
+} from '@taiga-ui/testing';
 
 import {TuiInputComponent} from '../input.component';
 import {TuiInputModule} from '../input.module';
@@ -65,10 +70,10 @@ describe('Input', () => {
     })
     class TestComponent {
         @ViewChild(TuiInputComponent, {static: true})
-        component: TuiInputComponent;
+        component!: TuiInputComponent;
 
         @ViewChild('submit')
-        submit: ElementRef<HTMLButtonElement>;
+        submit!: ElementRef<HTMLButtonElement>;
 
         cleaner = false;
 

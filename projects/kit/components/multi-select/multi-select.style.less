@@ -24,6 +24,22 @@
     display: flex;
     pointer-events: none;
     justify-content: flex-end;
+
+    &_disabled {
+        opacity: var(--tui-disabled-opacity);
+    }
+
+    :host-context([data-size='s']) & {
+        height: var(--tui-height-s);
+    }
+
+    :host-context([data-size='m']) & {
+        height: var(--tui-height-m);
+    }
+
+    :host-context([data-size='l']) & {
+        height: var(--tui-height-l);
+    }
 }
 
 .t-group {
@@ -36,12 +52,12 @@
         padding-top: 0.0625rem;
         padding-bottom: 0;
 
-        :host[data-tui-host-size='m'] && {
+        :host[data-size='m'] && {
             padding-top: 0;
         }
     }
 
-    :host[data-tui-host-size='m'] & {
+    :host[data-size='m'] & {
         padding: 1.1875rem 0.75rem 0;
         font-size: 0.8125rem;
     }
@@ -51,20 +67,8 @@
     .transition(transform);
     .icon-button();
     width: 1.5rem;
-    height: 1.5rem;
-    margin: 1rem 0.75rem;
+    height: auto;
+    margin: 0 0.75rem;
     pointer-events: auto;
     cursor: pointer;
-
-    &_open {
-        transform: rotate(-180deg);
-    }
-
-    [data-tui-host-size='m'] + .t-wrapper & {
-        margin: 0.625rem 0.75rem;
-    }
-
-    [data-tui-host-size='s'] + .t-wrapper & {
-        margin: 0.25rem 0.5rem;
-    }
 }

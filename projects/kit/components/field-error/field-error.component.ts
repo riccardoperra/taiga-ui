@@ -16,11 +16,10 @@ import {
 import {tuiDefaultProp, tuiPure, TuiValidationError} from '@taiga-ui/cdk';
 import {TUI_VALIDATION_ERRORS} from '@taiga-ui/kit/tokens';
 import {PolymorpheusContent} from '@tinkoff/ng-polymorpheus';
-import {EMPTY, isObservable, merge, Observable} from 'rxjs';
+import {EMPTY, isObservable, merge, Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 const EMPTY_RECORD = {};
-
 // @dynamic
 @Component({
     selector: 'tui-field-error',
@@ -71,14 +70,8 @@ export class TuiFieldErrorComponent {
         );
     }
 
-    get computedError(): TuiValidationError | Observable<TuiValidationError> | null {
-        return (this.invalid && this.touched && this.error) || null;
-    }
-
-    get isObservable() {
-        const {errorId} = this;
-
-        return isObservable(this.validationErrors[errorId]);
+    get computedError(): Observable<TuiValidationError | null> {
+        return (this.invalid && this.touched && this.error) || of(null);
     }
 
     registerOnChange() {}
@@ -89,11 +82,11 @@ export class TuiFieldErrorComponent {
 
     writeValue() {}
 
-    private get error(): TuiValidationError | Observable<TuiValidationError> | null {
+    private get error(): Observable<TuiValidationError | null> {
         const {errorId} = this;
 
         if (!errorId) {
-            return null;
+            return of(null);
         }
 
         const firstError = this.controlErrors[errorId];
@@ -153,13 +146,13 @@ export class TuiFieldErrorComponent {
     private getError(
         firstError: any,
         errorContent?: PolymorpheusContent | Observable<PolymorpheusContent>,
-    ): TuiValidationError | Observable<TuiValidationError> | null {
+    ): Observable<TuiValidationError> {
         if (firstError instanceof TuiValidationError) {
-            return firstError;
+            return of(firstError);
         }
 
         if (errorContent === undefined && typeof firstError === 'string') {
-            return new TuiValidationError(firstError);
+            return of(new TuiValidationError(firstError));
         }
 
         if (isObservable(errorContent)) {
@@ -168,6 +161,6 @@ export class TuiFieldErrorComponent {
             );
         }
 
-        return new TuiValidationError(errorContent || '', firstError);
+        return of(new TuiValidationError(errorContent || '', firstError));
     }
 }

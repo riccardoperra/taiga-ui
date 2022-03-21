@@ -4,7 +4,6 @@ import {
     Component,
     ContentChild,
     EventEmitter,
-    forwardRef,
     Inject,
     Input,
     Optional,
@@ -19,59 +18,41 @@ import {
     isNativeFocused,
     isPresent,
     setNativeFocused,
-    TUI_DEFAULT_IDENTITY_MATCHER,
-    TUI_DEFAULT_STRINGIFY,
-    TUI_FOCUSABLE_ITEM_ACCESSOR,
     TUI_STRICT_MATCHER,
+    TuiActiveZoneDirective,
+    TuiContextWithImplicit,
     tuiDefaultProp,
     TuiFocusableElementAccessor,
-    TuiIdentityMatcher,
     tuiPure,
-    TuiStringHandler,
     TuiStringMatcher,
 } from '@taiga-ui/cdk';
 import {
     TUI_DATA_LIST_ACCESSOR,
-    TUI_DATA_LIST_HOST,
-    TUI_OPTION_CONTENT,
     TuiDataListAccessor,
     TuiDataListDirective,
     TuiDataListHost,
     TuiHostedDropdownComponent,
     TuiPrimitiveTextfieldComponent,
+    TuiSizeL,
+    TuiSizeM,
+    TuiSizeS,
     TuiValueContentContext,
 } from '@taiga-ui/core';
-import {TUI_ARROW} from '@taiga-ui/kit/components/arrow';
-import {TUI_SELECT_OPTION} from '@taiga-ui/kit/components/select-option';
-import {FIXED_DROPDOWN_CONTROLLER_PROVIDER} from '@taiga-ui/kit/providers';
+import {TUI_ARROW_MODE, TuiArrowMode} from '@taiga-ui/kit/components/arrow';
+import {TUI_ITEMS_HANDLERS, TuiItemsHandlers} from '@taiga-ui/kit/tokens';
 import {PolymorpheusContent} from '@tinkoff/ng-polymorpheus';
 
-// TODO: remove in ivy compilation
-export const COMBOBOX_OPTION: any = TUI_SELECT_OPTION;
+import {TUI_COMBO_BOX_PROVIDERS} from './combo-box.providers';
 
 @Component({
     selector: 'tui-combo-box',
     templateUrl: './combo-box.template.html',
     styleUrls: ['./combo-box.style.less'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [
-        {
-            provide: TUI_FOCUSABLE_ITEM_ACCESSOR,
-            useExisting: forwardRef(() => TuiComboBoxComponent),
-        },
-        {
-            provide: TUI_DATA_LIST_HOST,
-            useExisting: forwardRef(() => TuiComboBoxComponent),
-        },
-        {
-            provide: TUI_OPTION_CONTENT,
-            useValue: COMBOBOX_OPTION,
-        },
-        FIXED_DROPDOWN_CONTROLLER_PROVIDER,
-    ],
+    providers: TUI_COMBO_BOX_PROVIDERS,
 })
 export class TuiComboBoxComponent<T>
-    extends AbstractTuiNullableControl<T | string>
+    extends AbstractTuiNullableControl<T>
     implements TuiFocusableElementAccessor, TuiDataListHost<T>
 {
     @ContentChild(TUI_DATA_LIST_ACCESSOR as any)
@@ -85,7 +66,7 @@ export class TuiComboBoxComponent<T>
 
     @Input()
     @tuiDefaultProp()
-    stringify: TuiStringHandler<T> = TUI_DEFAULT_STRINGIFY;
+    stringify: TuiItemsHandlers<T>['stringify'] = this.itemsHandlers.stringify;
 
     @Input()
     @tuiDefaultProp()
@@ -93,7 +74,8 @@ export class TuiComboBoxComponent<T>
 
     @Input()
     @tuiDefaultProp()
-    identityMatcher: TuiIdentityMatcher<T> = TUI_DEFAULT_IDENTITY_MATCHER;
+    identityMatcher: TuiItemsHandlers<T>['identityMatcher'] =
+        this.itemsHandlers.identityMatcher;
 
     @Input()
     @tuiDefaultProp()
@@ -105,13 +87,15 @@ export class TuiComboBoxComponent<T>
 
     @Input()
     @tuiDefaultProp()
-    search: string | null = '';
+    search: string | null = null;
 
     @Output()
     readonly searchChange = new EventEmitter<string | null>();
 
     @ContentChild(TuiDataListDirective, {read: TemplateRef})
-    readonly datalist: PolymorpheusContent = '';
+    readonly datalist: PolymorpheusContent<
+        TuiContextWithImplicit<TuiActiveZoneDirective>
+    > = '';
 
     open = false;
 
@@ -121,12 +105,18 @@ export class TuiComboBoxComponent<T>
         @Inject(NgControl)
         control: NgControl | null,
         @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
+        @Inject(TUI_ARROW_MODE)
+        private readonly arrowMode: TuiArrowMode,
+        @Inject(TUI_ITEMS_HANDLERS)
+        private readonly itemsHandlers: TuiItemsHandlers<T>,
     ) {
         super(control, changeDetectorRef);
     }
 
-    get arrow(): PolymorpheusContent {
-        return this.disabled || this.readOnly ? '' : TUI_ARROW;
+    get arrow(): PolymorpheusContent<
+        TuiContextWithImplicit<TuiSizeS | TuiSizeM | TuiSizeL>
+    > {
+        return !this.interactive ? this.arrowMode.disabled : this.arrowMode.interactive;
     }
 
     get nativeFocusableElement(): HTMLInputElement | null {
@@ -141,19 +131,11 @@ export class TuiComboBoxComponent<T>
     }
 
     get nativeValue(): string {
-        if (this.value === null) {
-            return this.search || '';
-        }
-
-        return typeof this.value === 'string' ? this.value : this.stringify(this.value);
+        return this.value === null ? this.search || '' : this.stringify(this.value);
     }
 
     get showValueTemplate(): boolean {
         return isPresent(this.value) && !this.focused;
-    }
-
-    get canOpen(): boolean {
-        return !this.computedDisabled && !this.readOnly;
     }
 
     get computedContent(): PolymorpheusContent<TuiValueContentContext<T>> {
@@ -197,7 +179,7 @@ export class TuiComboBoxComponent<T>
             event.preventDefault();
         }
 
-        const options = this.accessor ? this.accessor.getOptions() : [];
+        const options = this.accessor?.getOptions() || [];
 
         if (options.length !== 1) {
             return;
@@ -208,12 +190,10 @@ export class TuiComboBoxComponent<T>
         this.close();
     }
 
-    onInput(value: string) {
+    onValueChange(value: string) {
         this.updateSearch(value);
 
-        const match =
-            this.accessor &&
-            this.accessor.getOptions().find(item => this.isStrictMatch(item));
+        const match = this.accessor?.getOptions().find(item => this.isStrictMatch(item));
 
         if (match !== undefined) {
             this.updateValue(match);
@@ -222,8 +202,15 @@ export class TuiComboBoxComponent<T>
             return;
         }
 
-        this.updateValue(this.strict || this.search === '' ? null : this.search);
+        if (this.strict || this.search === '') {
+            this.updateValue(null);
+        }
+
         this.hostedDropdown?.updateOpen(true);
+    }
+
+    updateValue(value: T | null) {
+        super.updateValue(value);
     }
 
     onHovered(hovered: boolean) {
@@ -231,9 +218,7 @@ export class TuiComboBoxComponent<T>
     }
 
     toggle() {
-        if (this.hostedDropdown) {
-            this.hostedDropdown.updateOpen(!this.open);
-        }
+        this.hostedDropdown?.updateOpen(!this.open);
     }
 
     private isStrictMatch(item: T): boolean {
@@ -241,9 +226,7 @@ export class TuiComboBoxComponent<T>
     }
 
     private close() {
-        if (this.hostedDropdown) {
-            this.hostedDropdown.updateOpen(false);
-        }
+        this.hostedDropdown?.updateOpen(false);
     }
 
     private updateSearch(search: string | null) {

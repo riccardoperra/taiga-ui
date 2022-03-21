@@ -10,8 +10,7 @@ import {
     TuiSizeS,
     TuiTextfieldControllerModule,
 } from '@taiga-ui/core';
-import {NativeInputPO, PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, NativeInputPO, PageObject} from '@taiga-ui/testing';
 
 import {TuiInputNumberComponent} from '../input-number.component';
 import {TuiInputNumberModule} from '../input-number.module';
@@ -128,7 +127,7 @@ describe('InputNumber', () => {
         });
     });
 
-    it('There is no minus sign for negative values ​​with min> = 0', done => {
+    it('There is no minus sign for negative values with min> = 0', done => {
         testComponent.component.min = 0;
         testComponent.control.setValue(-12345);
         fixture.detectChanges();
@@ -156,30 +155,38 @@ describe('InputNumber', () => {
         });
     });
 
-    describe('onValue | updating form values', () => {
+    describe('onValueChange | updating form values', () => {
         describe('An incomplete value is passed to the form null', () => {
             it(`Value ''`, () => {
-                component.onValue('');
+                component.onValueChange('');
 
                 expect(testComponent.control.value).toBe(null);
             });
 
             it(`Value '-'`, () => {
-                component.onValue('-');
+                component.onValueChange('-');
 
                 expect(testComponent.control.value).toBe(null);
             });
 
             it(`Value ','`, () => {
-                component.onValue(',');
+                component.onValueChange(',');
 
                 expect(testComponent.control.value).toBe(null);
             });
 
             it(`Value '-,'`, () => {
-                component.onValue('-,');
+                component.onValueChange('-,');
 
                 expect(testComponent.control.value).toBe(null);
+            });
+
+            it(`Value does not depend on the separator`, () => {
+                component.onValueChange('123456,50');
+                expect(testComponent.control.value).toBe(123456.5);
+
+                component.onValueChange('123456.50');
+                expect(testComponent.control.value).toBe(123456.5);
             });
         });
 
@@ -191,7 +198,7 @@ describe('InputNumber', () => {
 
             it('A value less than positive min does not update the control', () => {
                 testComponent.component.min = 15;
-                component.onValue(`10`);
+                component.onValueChange(`10`);
 
                 expect(testComponent.control.value).toBe(null);
             });
@@ -200,14 +207,14 @@ describe('InputNumber', () => {
                 const savedMax = 25;
 
                 testComponent.component.max = savedMax;
-                component.onValue(`50`);
+                component.onValueChange(`50`);
 
                 expect(testComponent.control.value).toBe(savedMax);
             });
 
             it('A value greater than negative max does not update the control', () => {
                 testComponent.component.max = -15;
-                component.onValue(`-10`);
+                component.onValueChange(`-10`);
 
                 expect(testComponent.control.value).toBe(null);
             });
@@ -216,14 +223,14 @@ describe('InputNumber', () => {
                 const savedMin = -25;
 
                 testComponent.component.min = savedMin;
-                component.onValue(`-50`);
+                component.onValueChange(`-50`);
 
                 expect(testComponent.control.value).toBe(savedMin);
             });
         });
 
         it(`The correctly filled value is passed to the form number`, () => {
-            component.onValue(`-12${CHAR_NO_BREAK_SPACE}345,67`);
+            component.onValueChange(`-12${CHAR_NO_BREAK_SPACE}345,67`);
 
             expect(testComponent.control.value).toBe(-12345.67);
         });
@@ -304,20 +311,20 @@ describe('InputNumber', () => {
         });
     });
 
-    it('maxlength is set to 18 by default', () => {
+    it('maxlength is set to 23 by default (18 digits + 5 default separators)', () => {
         const nativeInput = getNativeInput()!.nativeElement;
 
-        expect(nativeInput.getAttribute('maxlength')).toBe('18');
+        expect(nativeInput.getAttribute('maxlength')).toBe('23');
     });
 
-    describe('При decimal === always', () => {
+    describe('When decimal === always', () => {
         it(`Adds the number of zeros specified by the precision property when updating Value with an integer`, () => {
             const value = '123';
             const precision = 2;
 
             component.decimal = 'always';
             component.precision = precision;
-            component.onValue(value);
+            component.onValueChange(value);
 
             expect(component.computedValue).toBe(`${value},00`);
         });
@@ -328,7 +335,7 @@ describe('InputNumber', () => {
 
             component.decimal = 'always';
             component.precision = precision;
-            component.onValue(value);
+            component.onValueChange(value);
 
             expect(component.computedValue).toBe(`${value},00`);
         });

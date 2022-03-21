@@ -2,7 +2,6 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
-    forwardRef,
     Inject,
     Input,
     Optional,
@@ -14,11 +13,11 @@ import {
     AbstractTuiNullableControl,
     ALWAYS_FALSE_HANDLER,
     TUI_FIRST_DAY,
-    TUI_FOCUSABLE_ITEM_ACCESSOR,
     TUI_LAST_DAY,
     TuiBooleanHandler,
     tuiDefaultProp,
     TuiFocusableElementAccessor,
+    TuiHandler,
     TuiMonth,
 } from '@taiga-ui/cdk';
 import {
@@ -28,20 +27,17 @@ import {
     TuiTextfieldSizeDirective,
     TuiWithOptionalMinMax,
 } from '@taiga-ui/core';
-import {LEFT_ALIGNED_DROPDOWN_CONTROLLER_PROVIDER} from '@taiga-ui/kit/providers';
+import {TUI_MONTH_FORMATTER} from '@taiga-ui/kit/tokens';
+import {Observable} from 'rxjs';
+
+import {TUI_INPUT_MONTH_PROVIDERS} from './input-month.providers';
 
 // @dynamic
 @Component({
     selector: 'tui-input-month',
     templateUrl: './input-month.template.html',
     styleUrls: ['./input-month.style.less'],
-    providers: [
-        {
-            provide: TUI_FOCUSABLE_ITEM_ACCESSOR,
-            useExisting: forwardRef(() => TuiInputMonthComponent),
-        },
-        LEFT_ALIGNED_DROPDOWN_CONTROLLER_PROVIDER,
-    ],
+    providers: TUI_INPUT_MONTH_PROVIDERS,
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TuiInputMonthComponent
@@ -73,6 +69,8 @@ export class TuiInputMonthComponent
         @Inject(ChangeDetectorRef) changeDetectorRef: ChangeDetectorRef,
         @Inject(TUI_TEXTFIELD_SIZE)
         private readonly textfieldSize: TuiTextfieldSizeDirective,
+        @Inject(TUI_MONTH_FORMATTER)
+        readonly formatter: TuiHandler<TuiMonth | null, Observable<string>>,
     ) {
         super(control, changeDetectorRef);
     }
@@ -91,15 +89,13 @@ export class TuiInputMonthComponent
             : 'tuiIconCalendar';
     }
 
-    get canOpen(): boolean {
-        return !this.computedDisabled && !this.readOnly;
-    }
-
     onValueChange(value: string) {
-        if (value === '') {
-            this.updateValue(null);
-            this.onOpenChange(true);
+        if (value) {
+            return;
         }
+
+        this.updateValue(null);
+        this.onOpenChange(true);
     }
 
     onMonthClick(month: TuiMonth) {

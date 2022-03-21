@@ -14,6 +14,7 @@ import {
     TUI_FOCUSABLE_ITEM_ACCESSOR,
     TuiContextWithImplicit,
     TuiFocusableElementAccessor,
+    TuiInputTypeT,
     TuiNativeFocusableElement,
     tuiPure,
 } from '@taiga-ui/cdk';
@@ -36,7 +37,10 @@ import {PolymorpheusContent} from '@tinkoff/ng-polymorpheus';
 import {combineLatest, Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 
-import {InputPasswordOptions, TUI_INPUT_PASSWORD_OPTIONS} from './input-password-options';
+import {
+    TUI_INPUT_PASSWORD_OPTIONS,
+    TuiInputPasswordOptions,
+} from './input-password-options';
 
 // @dynamic
 @Component({
@@ -47,6 +51,10 @@ import {InputPasswordOptions, TUI_INPUT_PASSWORD_OPTIONS} from './input-password
     providers: [
         {
             provide: TUI_FOCUSABLE_ITEM_ACCESSOR,
+            useExisting: forwardRef(() => TuiInputPasswordComponent),
+        },
+        {
+            provide: AbstractTuiControl,
             useExisting: forwardRef(() => TuiInputPasswordComponent),
         },
         HINT_CONTROLLER_PROVIDER,
@@ -62,17 +70,18 @@ export class TuiInputPasswordComponent
 
     isPasswordHidden = true;
 
-    readonly computedMode$: Observable<TuiBrightness | TuiHintModeT | null> =
-        combineLatest([
-            this.mode$,
-            this.hintController.change$.pipe(
-                startWith(null),
-                map(() => this.hintController.mode),
-            ),
-        ]).pipe(
-            map(([mode, controller]) => controller || mode),
+    readonly computedMode$: Observable<TuiHintModeT | null> = combineLatest([
+        this.mode$.pipe(map(val => (val === 'onDark' ? 'onDark' : null))),
+        this.hintController.change$.pipe(
             startWith(null),
-        );
+            map(() => this.hintController.mode),
+        ),
+    ]).pipe(
+        map(([mode, controller]) => controller || mode),
+        startWith(null),
+    );
+
+    readonly type!: TuiContextWithImplicit<TuiSizeS | TuiSizeL>;
 
     constructor(
         @Optional()
@@ -85,7 +94,7 @@ export class TuiInputPasswordComponent
         @Inject(TUI_PASSWORD_TEXTS)
         readonly passwordTexts$: Observable<[string, string]>,
         @Inject(TUI_INPUT_PASSWORD_OPTIONS)
-        readonly options: InputPasswordOptions,
+        readonly options: TuiInputPasswordOptions,
         @Inject(TUI_HINT_WATCHED_CONTROLLER)
         readonly hintController: TuiHintControllerDirective,
         @Inject(TUI_MODE)
@@ -112,12 +121,8 @@ export class TuiInputPasswordComponent
         return this.getContext(this.textfieldSize.size);
     }
 
-    get inputType(): string {
-        return this.isPasswordHidden || !this.hasEyeIcon ? 'password' : 'text';
-    }
-
-    get hasEyeIcon(): boolean {
-        return !(this.disabled || this.readOnly);
+    get inputType(): TuiInputTypeT {
+        return this.isPasswordHidden || !this.interactive ? 'password' : 'text';
     }
 
     onValueChange(textValue: string) {

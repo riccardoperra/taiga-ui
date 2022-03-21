@@ -43,6 +43,7 @@ import {
     TUI_DIGIT_REGEXP,
     TUI_MODE,
     TUI_NON_DIGIT_REGEXP,
+    TUI_TEXTFIELD_APPEARANCE,
     TuiBrightness,
     TuiDataListComponent,
     TuiDataListDirective,
@@ -50,6 +51,7 @@ import {
     TuiTextMaskOptions,
 } from '@taiga-ui/core';
 import {PolymorpheusContent} from '@tinkoff/ng-polymorpheus';
+import {TextMaskConfig} from 'angular2-text-mask';
 import {Observable} from 'rxjs';
 
 import {
@@ -89,7 +91,7 @@ const ICONS = {
     ],
     host: {
         '($.data-mode.attr)': 'mode$',
-        'data-tui-host-size': 'l',
+        'data-size': 'l',
     },
 })
 export class TuiInputCardGroupedComponent
@@ -147,18 +149,18 @@ export class TuiInputCardGroupedComponent
 
     exampleTextCVC = '000';
 
-    maskCVC: TuiTextMaskOptions = {
+    maskCVC: TextMaskConfig = {
         mask: new Array(3).fill(TUI_DIGIT_REGEXP),
         guide: false,
     };
 
-    readonly maskCard: TuiTextMaskOptions = {
+    readonly maskCard: TextMaskConfig = {
         mask: TUI_CARD_MASK,
         guide: false,
         pipe: conformedValue => conformedValue.trim(),
     };
 
-    readonly maskExpire: TuiTextMaskOptions = {
+    readonly maskExpire: TextMaskConfig = {
         mask: [
             TUI_DIGIT_REGEXP,
             TUI_DIGIT_REGEXP,
@@ -168,7 +170,7 @@ export class TuiInputCardGroupedComponent
         ],
         pipe: tuiCreateAutoCorrectedExpirePipe(),
         guide: false,
-    };
+    } as TuiTextMaskOptions as unknown as TextMaskConfig;
 
     open = false;
 
@@ -182,6 +184,8 @@ export class TuiInputCardGroupedComponent
         @Inject(TUI_MODE) readonly mode$: Observable<TuiBrightness | null>,
         @Inject(TUI_INPUT_CARD_GROUPED_TEXTS)
         readonly cardGroupedTexts$: Observable<TuiCardGroupedTexts>,
+        @Inject(TUI_TEXTFIELD_APPEARANCE)
+        readonly appearance: string,
     ) {
         super(control, changeDetectorRef);
     }
@@ -231,7 +235,11 @@ export class TuiInputCardGroupedComponent
     }
 
     get placeholderRaised(): boolean {
-        return (this.computedFocused && !this.readOnly) || !!this.value;
+        return (this.computedFocused && !this.readOnly) || this.hasCardNumber;
+    }
+
+    get hasCardNumber(): boolean {
+        return !!this.value?.card?.trim();
     }
 
     get formattedCard(): string {
@@ -244,15 +252,15 @@ export class TuiInputCardGroupedComponent
     }
 
     get idCard(): string {
-        return this.id + '_card';
+        return `${this.id}_card`;
     }
 
     get idExpire(): string {
-        return this.id + '_expire';
+        return `${this.id}_expire`;
     }
 
     get idCVC(): string {
-        return this.id + '_cvc';
+        return `${this.id}_cvc`;
     }
 
     get isCardCollapsed(): boolean {
@@ -359,11 +367,11 @@ export class TuiInputCardGroupedComponent
         }
 
         if (parseInt(expire.substr(0, 2), 10) > 12) {
-            expire = '12' + expire.substr(2);
+            expire = `12${expire.substr(2)}`;
         }
 
         if (expire.substr(0, 2) === '00') {
-            expire = '01' + expire.substr(2);
+            expire = `01${expire.substr(2)}`;
         }
 
         this.inputExpire.nativeElement.value = expire;

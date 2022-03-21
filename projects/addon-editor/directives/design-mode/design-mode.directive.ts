@@ -26,6 +26,7 @@ import {
     preventDefault,
     setNativeFocused,
     TUI_FOCUSABLE_ITEM_ACCESSOR,
+    TuiComputedDocumentException,
     TuiDestroyService,
     TuiEventWith,
     TuiFocusableElementAccessor,
@@ -115,7 +116,7 @@ export class TuiDesignModeDirective
         const {contentDocument} = this.elementRef.nativeElement;
 
         if (!contentDocument) {
-            throw new Error('Only use computedDocument after load event');
+            throw new TuiComputedDocumentException();
         }
 
         return contentDocument;
@@ -257,7 +258,7 @@ export class TuiDesignModeDirective
                 filter(
                     event =>
                         !event.clipboardData ||
-                        event.clipboardData.types.indexOf('Files') === -1,
+                        !event.clipboardData.types.includes('Files'),
                 ),
                 preventDefault(),
                 map(event => this.sanitize(getClipboardDataText(event, 'text/html'))),
@@ -348,7 +349,7 @@ export class TuiDesignModeDirective
     }
 
     private updateHeight() {
-        if (!this.documentRef) {
+        if (!this.documentRef?.createRange) {
             return;
         }
 

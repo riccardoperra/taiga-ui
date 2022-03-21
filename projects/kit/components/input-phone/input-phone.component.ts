@@ -4,7 +4,6 @@ import {
     Component,
     ContentChild,
     EventEmitter,
-    forwardRef,
     Inject,
     Input,
     Optional,
@@ -19,7 +18,6 @@ import {
     getClipboardDataText,
     isNativeFocused,
     setNativeFocused,
-    TUI_FOCUSABLE_ITEM_ACCESSOR,
     TuiActiveZoneDirective,
     TuiContextWithImplicit,
     tuiDefaultProp,
@@ -29,7 +27,6 @@ import {
 } from '@taiga-ui/cdk';
 import {
     formatPhone,
-    TUI_DATA_LIST_HOST,
     TUI_TEXTFIELD_CLEANER,
     TuiDataListDirective,
     TuiDataListHost,
@@ -38,6 +35,7 @@ import {
     TuiTextfieldCleanerDirective,
     TuiTextMaskOptions,
 } from '@taiga-ui/core';
+import {TextMaskConfig} from 'angular2-text-mask';
 import {Observable} from 'rxjs';
 
 import {INPUT_PHONE_PROVIDERS, SELECTION_STREAM} from './input-phone.providers';
@@ -50,17 +48,7 @@ const NON_PLUS_AND_DIGITS_REGEX = /[ \-_()]/g;
     templateUrl: './input-phone.template.html',
     styleUrls: ['./input-phone.style.less'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [
-        {
-            provide: TUI_FOCUSABLE_ITEM_ACCESSOR,
-            useExisting: forwardRef(() => TuiInputPhoneComponent),
-        },
-        {
-            provide: TUI_DATA_LIST_HOST,
-            useExisting: forwardRef(() => TuiInputPhoneComponent),
-        },
-        INPUT_PHONE_PROVIDERS,
-    ],
+    providers: INPUT_PHONE_PROVIDERS,
 })
 export class TuiInputPhoneComponent
     extends AbstractTuiControl<string>
@@ -75,7 +63,7 @@ export class TuiInputPhoneComponent
     @Input('countryCode')
     @tuiRequiredSetter()
     set countryCodeSetter(countryCode: string) {
-        this.updateValueWithNewContryCode(countryCode);
+        this.updateValueWithNewCountryCode(countryCode);
         this.countryCode = countryCode;
     }
 
@@ -97,7 +85,7 @@ export class TuiInputPhoneComponent
     @ContentChild(TuiDataListDirective, {read: TemplateRef})
     readonly datalist?: TemplateRef<TuiContextWithImplicit<TuiActiveZoneDirective>>;
 
-    readonly textMaskOptions: TuiTextMaskOptions = {
+    readonly textMaskOptions: TextMaskConfig = {
         mask: value =>
             this.allowText && !this.value && isText(value) && value !== '+'
                 ? false
@@ -119,7 +107,7 @@ export class TuiInputPhoneComponent
                 : value.replace(/-$/, '');
         },
         guide: false,
-    };
+    } as TuiTextMaskOptions as unknown as TextMaskConfig;
 
     countryCode = '+7';
 
@@ -156,7 +144,7 @@ export class TuiInputPhoneComponent
         );
     }
 
-    get nativeValue(): string {
+    get computedValue(): string {
         return this.value
             ? formatPhone(this.value, this.countryCode, this.phoneMaskAfterCountryCode)
             : this.search || '';
@@ -167,11 +155,11 @@ export class TuiInputPhoneComponent
     }
 
     get canOpen(): boolean {
-        return !this.computedDisabled && !this.readOnly && !!this.datalist;
+        return this.interactive && !!this.datalist;
     }
 
     get canClean(): boolean {
-        return this.nativeValue !== this.countryCode && this.textfieldCleaner.cleaner;
+        return this.computedValue !== this.countryCode && this.textfieldCleaner.cleaner;
     }
 
     onHovered(hovered: boolean) {
@@ -194,14 +182,14 @@ export class TuiInputPhoneComponent
     onActiveZone(active: boolean) {
         this.updateFocused(active);
 
-        if (active && !this.nativeValue && !this.readOnly && !this.allowText) {
+        if (active && !this.computedValue && !this.readOnly && !this.allowText) {
             this.updateSearch(this.countryCode);
 
             return;
         }
 
         if (
-            this.nativeValue === this.countryCode ||
+            this.computedValue === this.countryCode ||
             (this.search !== null &&
                 isNaN(parseInt(this.search.replace(NON_PLUS_AND_DIGITS_REGEX, ''), 10)))
         ) {
@@ -209,10 +197,12 @@ export class TuiInputPhoneComponent
         }
     }
 
-    onBackspace(event: Event & {target: HTMLInputElement}) {
+    onBackspace(event: KeyboardEvent) {
+        const target = event.target as HTMLInputElement;
+
         if (
-            (event.target.selectionStart || 0) <= this.nonRemovableLength &&
-            event.target.selectionStart === event.target.selectionEnd
+            (target.selectionStart || 0) <= this.nonRemovableLength &&
+            target.selectionStart === target.selectionEnd
         ) {
             event.preventDefault();
         }
@@ -316,7 +306,7 @@ export class TuiInputPhoneComponent
             this.value.length < this.maxPhoneLength;
         const newValueLength = value.replace(NON_PLUS_AND_DIGITS_REGEX, '').length;
         const cleanNewValue = value.replace(/[^0-9]+/g, '');
-        const selectionLength = getSelection()!.toString().length;
+        const selectionLength = String(getSelection()).length;
 
         if (oldValueExist && selectionLength === 0) {
             return `${this.value}${cleanNewValue}`.slice(0, this.maxPhoneLength);
@@ -347,7 +337,7 @@ export class TuiInputPhoneComponent
         this.searchChange.emit(search);
     }
 
-    private updateValueWithNewContryCode(newCountryCode: string) {
+    private updateValueWithNewCountryCode(newCountryCode: string) {
         if (!this.isTextValue) {
             this.updateValue(this.value.replace(this.countryCode, newCountryCode));
         }

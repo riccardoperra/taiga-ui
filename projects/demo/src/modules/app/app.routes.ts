@@ -107,6 +107,14 @@ export const ROUTES = [
         },
     },
     {
+        path: 'portals',
+        loadChildren: () =>
+            import(`../customization/portals/portals.module`).then(m => m.PortalsModule),
+        data: {
+            title: `Portals`,
+        },
+    },
+    {
         path: 'icon-set',
         loadChildren: () =>
             import(`../customization/icon-set/icon-set.module`).then(
@@ -318,7 +326,27 @@ export const ROUTES = [
                 m => m.ExampleTuiFieldErrorModule,
             ),
         data: {
-            title: 'FieldError ',
+            title: 'FieldError',
+        },
+    },
+    {
+        path: 'pipes/field-error',
+        loadChildren: () =>
+            import(`../pipes/field-error/field-error.module`).then(
+                m => m.ExampleTuiFieldErrorModule,
+            ),
+        data: {
+            title: 'FieldError',
+        },
+    },
+    {
+        path: 'components/input-files',
+        loadChildren: () =>
+            import(`../components/input-files/input-files.module`).then(
+                m => m.ExampleTuiFilesModule,
+            ),
+        data: {
+            title: 'InputFiles',
         },
     },
     {
@@ -722,6 +750,16 @@ export const ROUTES = [
         },
     },
     {
+        path: 'components/rating',
+        loadChildren: () =>
+            import(`../components/rating/rating.module`).then(
+                m => m.ExampleTuiRatingModule,
+            ),
+        data: {
+            title: 'Rating',
+        },
+    },
+    {
         path: 'components/range',
         loadChildren: () =>
             import(`../components/range/range.module`).then(m => m.ExampleTuiRangeModule),
@@ -775,6 +813,16 @@ export const ROUTES = [
             ),
         data: {
             title: 'Slider',
+        },
+    },
+    {
+        path: 'components/slider-deprecated',
+        loadChildren: () =>
+            import(`../components/slider-old/slider-old.module`).then(
+                m => m.ExampleTuiSliderOldModule,
+            ),
+        data: {
+            title: 'Slider[deprecated]',
         },
     },
     {
@@ -1677,6 +1725,19 @@ export const ROUTES = [
             title: 'Tokens',
         },
     },
+
+    // ANIMATIONS
+    {
+        path: 'animations',
+        loadChildren: () =>
+            import(`../animations/animations.module`).then(
+                m => m.ExampleAnimationsModule,
+            ),
+        data: {
+            title: 'Animations',
+        },
+    },
+
     {path: '**', redirectTo: ''},
 ];
 

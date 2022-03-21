@@ -1,6 +1,6 @@
 import {Component, ViewChild} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite} from '@taiga-ui/testing';
 
 import {TuiCardComponent} from '../card.component';
 import {TuiCardModule} from '../card.module';
@@ -17,7 +17,7 @@ describe('Card', () => {
     })
     class TestComponent {
         @ViewChild(TuiCardComponent, {static: true})
-        component: TuiCardComponent;
+        component!: TuiCardComponent;
 
         paymentSystem: any | null = null;
         brandLogo = '';

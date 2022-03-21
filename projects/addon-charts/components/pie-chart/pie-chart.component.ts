@@ -51,7 +51,7 @@ export class TuiPieChartComponent {
     value: readonly number[] = [];
 
     @Input()
-    @HostBinding('attr.data-tui-host-size')
+    @HostBinding('attr.data-size')
     @tuiDefaultProp()
     size: TuiSizeXS | TuiSizeXL = 'm';
 
@@ -88,7 +88,7 @@ export class TuiPieChartComponent {
     }
 
     get maskId(): string {
-        return 'tui-ring-chart-' + this.autoIdString;
+        return `tui-ring-chart-${this.autoIdString}`;
     }
 
     get mask(): string | null {

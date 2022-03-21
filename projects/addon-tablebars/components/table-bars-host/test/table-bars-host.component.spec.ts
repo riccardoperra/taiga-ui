@@ -1,8 +1,7 @@
 import {Component, DebugElement, ViewChild} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
-import {PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, PageObject} from '@taiga-ui/testing';
 import {Subscription, timer} from 'rxjs';
 import {skip, take, takeUntil} from 'rxjs/operators';
 
@@ -18,7 +17,7 @@ describe('TableBarsHost', () => {
     })
     class TestComponent {
         @ViewChild(TuiTableBarsHostComponent, {static: true})
-        component: TuiTableBarsHostComponent;
+        component!: TuiTableBarsHostComponent;
     }
 
     let fixture: ComponentFixture<TestComponent>;

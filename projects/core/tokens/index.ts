@@ -21,4 +21,6 @@ export * from './sanitizer';
 export * from './scroll-ref';
 export * from './svg-src-processor';
 export * from './textfield-appearance';
+export * from './textfield-host';
+export * from './theme';
 export * from './value-accessor';

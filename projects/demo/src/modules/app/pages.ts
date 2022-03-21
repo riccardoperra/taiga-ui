@@ -545,6 +545,12 @@ export const pages: TuiDocPages = [
                     'wysiwyg, editor, редактор, текст, html, rich, text, input, инпут, ввод',
                 route: '/components/editor-new',
             },
+            {
+                section: $localize`Components`,
+                title: 'InputFiles',
+                keywords: 'input-files, files, file, файлы',
+                route: '/components/input-files',
+            },
         ],
     },
     {
@@ -682,6 +688,12 @@ export const pages: TuiDocPages = [
     },
     {
         section: $localize`Components`,
+        title: 'Rating',
+        keywords: 'рейтинг, оценка, звезда, rating, star, rate',
+        route: '/components/rating',
+    },
+    {
+        section: $localize`Components`,
         title: 'Selects',
         subPages: [
             {
@@ -739,6 +751,12 @@ export const pages: TuiDocPages = [
                 title: 'Slider',
                 keywords: 'инпут, числа, форма, ввод, slider, слайдер, range, диапазон',
                 route: '/components/slider',
+            },
+            {
+                section: $localize`Components`,
+                title: 'Slider[deprecated]',
+                keywords: 'инпут, числа, форма, ввод, slider, слайдер, range, диапазон',
+                route: '/components/slider-deprecated',
             },
             {
                 section: $localize`Components`,
@@ -887,11 +905,23 @@ export const pages: TuiDocPages = [
     },
     {
         section: $localize`Customization`,
+        title: `Portals`,
+        keywords: 'portal, custom, theme, style',
+        route: 'portals',
+    },
+    {
+        section: $localize`Customization`,
         title: `Icon set`,
         keywords: 'icons, svg, theme, custom, style, sanitizer',
         route: 'icon-set',
     },
     // Tools
+    {
+        section: $localize`Tools`,
+        title: 'Animations',
+        keywords: 'animation, animations, анимация, анимации',
+        route: '/animations',
+    },
     {
         section: $localize`Tools`,
         title: $localize`Decorators`,
@@ -1156,6 +1186,12 @@ export const pages: TuiDocPages = [
                 title: 'Mapper',
                 keywords: 'mapper, мап, преобразование, пайп, pipe',
                 route: '/pipes/mapper',
+            },
+            {
+                section: $localize`Tools`,
+                title: 'FieldError',
+                keywords: 'error, field, hint, ошибка, преобразование, пайп, pipe',
+                route: '/pipes/field-error',
             },
             {
                 section: $localize`Tools`,

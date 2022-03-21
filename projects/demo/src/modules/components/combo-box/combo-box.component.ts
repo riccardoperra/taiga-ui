@@ -1,6 +1,7 @@
 import {Component, forwardRef, ViewChild} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {changeDetection} from '@demo/emulate/change-detection';
+import {TuiDocExample} from '@taiga-ui/addon-doc';
 import {
     TUI_DEFAULT_MATCHER,
     TUI_DEFAULT_STRINGIFY,
@@ -8,31 +9,10 @@ import {
     TuiIdentityMatcher,
     tuiPure,
     TuiStringHandler,
-    TuiStringMatcher,
 } from '@taiga-ui/cdk';
+import {TuiValueContentContext} from '@taiga-ui/core';
 import {PolymorpheusContent} from '@tinkoff/ng-polymorpheus';
 
-import {default as example1Html} from '!!raw-loader!./examples/1/index.html';
-import {default as example1Less} from '!!raw-loader!./examples/1/index.less';
-import {default as example1Ts} from '!!raw-loader!./examples/1/index.ts';
-import {default as example2DatabaseMockTs} from '!!raw-loader!./examples/2/database-mock-data';
-import {default as example2Html} from '!!raw-loader!./examples/2/index.html';
-import {default as example2Less} from '!!raw-loader!./examples/2/index.less';
-import {default as example2Ts} from '!!raw-loader!./examples/2/index.ts';
-import {default as example2ServiceTs} from '!!raw-loader!./examples/2/request.service';
-import {default as example2UserTs} from '!!raw-loader!./examples/2/user';
-import {default as example3Html} from '!!raw-loader!./examples/3/index.html';
-import {default as example3Ts} from '!!raw-loader!./examples/3/index.ts';
-import {default as example4Html} from '!!raw-loader!./examples/4/index.html';
-import {default as example4Ts} from '!!raw-loader!./examples/4/index.ts';
-import {default as example5Html} from '!!raw-loader!./examples/5/index.html';
-import {default as example5Less} from '!!raw-loader!./examples/5/index.less';
-import {default as example5Ts} from '!!raw-loader!./examples/5/index.ts';
-import {default as exampleDeclareForm} from '!!raw-loader!./examples/import/declare-form.txt';
-import {default as exampleImportModule} from '!!raw-loader!./examples/import/import-module.txt';
-import {default as exampleInsertTemplate} from '!!raw-loader!./examples/import/insert-template.txt';
-
-import {FrontEndExample} from '../../interfaces/front-end-example';
 import {AbstractExampleTuiControl} from '../abstract/control';
 import {ABSTRACT_PROPS_ACCESSOR} from '../abstract/inherited-documentation/abstract-props-accessor';
 
@@ -58,41 +38,50 @@ class Account {
 })
 export class ExampleTuiComboBoxComponent extends AbstractExampleTuiControl {
     @ViewChild('valueTemplateContent')
-    private readonly valueTemplateRef: PolymorpheusContent = '';
+    private readonly valueTemplateRef: PolymorpheusContent<
+        TuiValueContentContext<Account>
+    > = '';
 
-    readonly exampleDeclareForm = exampleDeclareForm;
-    readonly exampleImportModule = exampleImportModule;
-    readonly exampleInsertTemplate = exampleInsertTemplate;
+    readonly exampleForm = import('!!raw-loader!./examples/import/declare-form.txt');
 
-    readonly example1: FrontEndExample = {
-        TypeScript: example1Ts,
-        HTML: example1Html,
-        LESS: example1Less,
+    readonly exampleModule = import('!!raw-loader!./examples/import/import-module.txt');
+
+    readonly exampleHtml = import('!!raw-loader!./examples/import/insert-template.txt');
+
+    readonly example1: TuiDocExample = {
+        TypeScript: import('!!raw-loader!./examples/1/index.ts'),
+        HTML: import('!!raw-loader!./examples/1/index.html'),
+        LESS: import('!!raw-loader!./examples/1/index.less'),
     };
 
-    readonly example2 = {
-        TypeScript: example2Ts,
-        HTML: example2Html,
-        LESS: example2Less,
-        'user.ts': example2UserTs,
-        'request.service.ts': example2ServiceTs,
-        'database-mock-data.ts': example2DatabaseMockTs,
+    readonly example2: TuiDocExample = {
+        TypeScript: import('!!raw-loader!./examples/2/index.ts'),
+        HTML: import('!!raw-loader!./examples/2/index.html'),
+        LESS: import('!!raw-loader!./examples/2/index.less'),
+        'user.ts': import('!!raw-loader!./examples/2/user'),
+        'request.service.ts': import('!!raw-loader!./examples/2/request.service'),
+        'database-mock-data.ts': import('!!raw-loader!./examples/2/database-mock-data'),
     };
 
-    readonly example3: FrontEndExample = {
-        TypeScript: example3Ts,
-        HTML: example3Html,
+    readonly example3: TuiDocExample = {
+        TypeScript: import('!!raw-loader!./examples/3/index.ts'),
+        HTML: import('!!raw-loader!./examples/3/index.html'),
     };
 
-    readonly example4: FrontEndExample = {
-        TypeScript: example4Ts,
-        HTML: example4Html,
+    readonly example4: TuiDocExample = {
+        TypeScript: import('!!raw-loader!./examples/4/index.ts'),
+        HTML: import('!!raw-loader!./examples/4/index.html'),
     };
 
-    readonly example5: FrontEndExample = {
-        TypeScript: example5Ts,
-        HTML: example5Html,
-        LESS: example5Less,
+    readonly example5: TuiDocExample = {
+        TypeScript: import('!!raw-loader!./examples/5/index.ts'),
+        HTML: import('!!raw-loader!./examples/5/index.html'),
+        LESS: import('!!raw-loader!./examples/5/index.less'),
+    };
+
+    readonly example6: TuiDocExample = {
+        TypeScript: import('!!raw-loader!./examples/6/index.ts'),
+        HTML: import('!!raw-loader!./examples/6/index.html'),
     };
 
     readonly items = [
@@ -116,15 +105,13 @@ export class ExampleTuiComboBoxComponent extends AbstractExampleTuiControl {
 
     stringify = this.stringifyVariants[0];
 
-    readonly strictMatcherVariants: ReadonlyArray<TuiStringMatcher<
-        Account | string
-    > | null> = [
+    readonly strictMatcherVariants = [
         TUI_STRICT_MATCHER,
-        (item, search, stringify) =>
+        (item: Account, search: string, stringify: TuiStringHandler<Account>) =>
             Number.parseInt(stringify(item).match(/\d+/g)![0], 10) ===
             Number.parseInt(search, 10),
         null,
-    ];
+    ] as const;
 
     strictMatcher = this.strictMatcherVariants[0];
 
@@ -137,7 +124,7 @@ export class ExampleTuiComboBoxComponent extends AbstractExampleTuiControl {
 
     readonly control = new FormControl(null, Validators.required);
 
-    get valueContent(): PolymorpheusContent {
+    get valueContent(): PolymorpheusContent<TuiValueContentContext<Account>> {
         return this.valueTemplateRef && this.selectedValueTemplate
             ? this.valueTemplateRef
             : '';

@@ -68,7 +68,7 @@
             linear-gradient(-45deg, transparent 75%, var(--tui-base-05) 75%);
     }
 
-    @media @mobile-m {
+    :host-context(tui-root._mobile) & {
         min-height: auto;
     }
 }
@@ -80,7 +80,7 @@
     box-sizing: border-box;
     overflow: hidden;
 
-    @media @mobile-m {
+    :host-context(tui-root._mobile) & {
         padding: 1rem;
     }
 }
@@ -155,7 +155,7 @@
         transform: translateX(-0.1875rem);
     }
 
-    @media @mobile-m {
+    :host-context(tui-root._mobile) & {
         display: none;
     }
 }
@@ -170,6 +170,16 @@
     .wrapper_light & {
         background: @color-dark-resizer;
     }
+}
+
+.t-group,
+.t-checkbox {
+    margin-left: 0.75rem;
+}
+
+.t-button,
+.t-form-controls {
+    margin-top: 0.75rem;
 }
 
 @supports (position: sticky) {

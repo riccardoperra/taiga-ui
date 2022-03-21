@@ -34,7 +34,7 @@ import {TUI_SHEET_PROVIDERS, TUI_SHEET_SCROLL} from './sheet.providers';
         role: 'dialog',
         '[attr.aria-labelledby]': 'id',
         '[class._ios]': 'isIos',
-        '[class._stuck]': 'true', // Initially disable snapping for Firefox
+        // '[class._stuck]': 'true', // Initially disable snapping for Firefox
         '[$.class._stuck]': 'stuck$',
         '($.class._stuck)': 'stuck$',
     },
@@ -103,6 +103,12 @@ export class TuiSheetComponent<T> implements AfterViewInit {
         }
 
         nativeElement.scrollTo({top, behavior: 'smooth'});
+    }
+
+    close() {
+        if (this.context.closeable) {
+            this.context.$implicit.complete();
+        }
     }
 
     private get contentTop(): number {

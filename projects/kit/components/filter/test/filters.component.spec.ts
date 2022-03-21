@@ -4,8 +4,7 @@ import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {ALWAYS_FALSE_HANDLER, TuiBooleanHandler, TuiHandler} from '@taiga-ui/cdk';
 import {TuiSizeS} from '@taiga-ui/core';
-import {PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, PageObject} from '@taiga-ui/testing';
 
 import {TuiFilterComponent} from '../filter.component';
 import {TuiFilterModule} from '../filter.module';
@@ -44,7 +43,7 @@ describe('Filter', () => {
     })
     class TestComponent {
         @ViewChild(TuiFilterComponent, {static: true})
-        component: TuiFilterComponent<any>;
+        component!: TuiFilterComponent<any>;
 
         disabledItemHandler: TuiBooleanHandler<any> = ALWAYS_FALSE_HANDLER;
 
@@ -153,7 +152,7 @@ describe('Filter', () => {
             testComponent.items = ARR_OBJECT;
             fixture.detectChanges();
 
-            expect(+getBadge().nativeElement.textContent).toBe(BADGE_VALUE);
+            expect(Number(getBadge().nativeElement.textContent)).toBe(BADGE_VALUE);
         });
     });
 
@@ -176,8 +175,8 @@ describe('Filter', () => {
             testComponent.items = ARR_OBJECT;
             fixture.detectChanges();
 
-            expect(getCheckbox().attributes['data-tui-host-size']).toBe('m');
-            expect(getBadge().attributes['data-tui-host-size']).toBe('m');
+            expect(getCheckbox().attributes['data-size']).toBe('m');
+            expect(getBadge().attributes['data-size']).toBe('m');
         });
 
         it('if s, then both CheckboxBlock and badge have s', () => {
@@ -185,8 +184,8 @@ describe('Filter', () => {
             testComponent.size = 's';
             fixture.detectChanges();
 
-            expect(getCheckbox().attributes['data-tui-host-size']).toBe('s');
-            expect(getBadge().attributes['data-tui-host-size']).toBe('s');
+            expect(getCheckbox().attributes['data-size']).toBe('s');
+            expect(getBadge().attributes['data-size']).toBe('s');
         });
     });
 });

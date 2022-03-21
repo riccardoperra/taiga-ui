@@ -25,7 +25,7 @@ import {map} from 'rxjs/operators';
     templateUrl: './file.template.html',
     styleUrls: ['./file.style.less'],
 })
-export class TuiFileComponent {
+export class TuiFileOldComponent {
     @Input()
     @tuiDefaultProp()
     file: TuiFileLike = {name: ''};
@@ -108,7 +108,7 @@ export class TuiFileComponent {
     }
 
     get type(): string {
-        return '.' + this.file.name.split('.').pop() || '';
+        return `.${this.file.name.split('.').pop()}` || '';
     }
 
     get content$(): Observable<PolymorpheusContent> {

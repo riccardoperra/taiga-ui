@@ -1,8 +1,7 @@
 import {Component, ViewChild} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
-import {NativeInputPO} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, NativeInputPO} from '@taiga-ui/testing';
 
 import {TuiInputExpireComponent} from '../input-expire.component';
 import {TuiInputExpireModule} from '../input-expire.module';
@@ -15,7 +14,7 @@ describe('InputExpire', () => {
     })
     class TestComponent {
         @ViewChild(TuiInputExpireComponent)
-        input: TuiInputExpireComponent;
+        input!: TuiInputExpireComponent;
 
         value = '';
     }

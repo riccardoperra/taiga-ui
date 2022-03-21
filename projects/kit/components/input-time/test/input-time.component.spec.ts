@@ -10,8 +10,7 @@ import {
     TuiSizeS,
     TuiTextfieldControllerModule,
 } from '@taiga-ui/core';
-import {NativeInputPO, PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, NativeInputPO, PageObject} from '@taiga-ui/testing';
 
 import {TuiInputTimeComponent} from '../input-time.component';
 import {TuiInputTimeModule} from '../input-time.module';
@@ -45,7 +44,7 @@ describe('InputTime', () => {
     })
     class TestComponent {
         @ViewChild(TuiInputTimeComponent, {static: true})
-        component: TuiInputTimeComponent;
+        component!: TuiInputTimeComponent;
 
         control = new FormControl(new TuiTime(12, 30));
         cleaner = false;

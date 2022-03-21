@@ -16,6 +16,7 @@ import {
     TuiTextfieldControllerModule,
 } from '@taiga-ui/core';
 import {
+    configureTestSuite,
     isActive,
     NativeInputPO,
     PageObject,
@@ -23,7 +24,6 @@ import {
     testPlaceholder,
     testTooltip,
 } from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
 
 import {TuiInputTagComponent} from '../input-tag.component';
 import {TuiInputTagModule} from '../input-tag.module';
@@ -43,6 +43,7 @@ describe('InputTag', () => {
                     *ngIf="!defaultInputs"
                     [formControl]="control"
                     [readOnly]="readOnly"
+                    [separator]="separator"
                     [allowSpaces]="allowSpaces"
                     [tagValidator]="tagValidator"
                     [tuiTextfieldCleaner]="cleaner"
@@ -50,21 +51,24 @@ describe('InputTag', () => {
                     [tuiTextfieldLabelOutside]="labelOutside"
                     [tuiTextfieldSize]="size"
                     [tuiHintContent]="hintContent"
-                ></tui-input-tag>
+                >
+                    Placeholder
+                </tui-input-tag>
             </tui-root>
         `,
     })
     class TestComponent {
         @ViewChild(TuiInputTagComponent)
-        component: TuiInputTagComponent;
+        component!: TuiInputTagComponent;
 
         control = new FormControl([TAG]);
         defaultInputs = false;
         cleaner = true;
         readOnly = false;
         allowSpaces = true;
+        separator = ',';
         labelOutside = true;
-        exampleText = 'Пример';
+        exampleText = 'Example';
         size: TuiSizeS | TuiSizeL = 'm';
         hintContent: string | null = 'prompt';
         tagValidator: TuiBooleanHandler<string> = ALWAYS_TRUE_HANDLER;
@@ -207,6 +211,20 @@ describe('InputTag', () => {
         });
     });
 
+    describe('Adding tags with custom serarator', () => {
+        it('Adds tags separated by custom separator', fakeAsync(() => {
+            testComponent.separator = ';';
+            inputPO.focus();
+            fixture.detectChanges();
+            inputPO.sendText('10,5;12,2');
+            focusStealer.focus();
+            fixture.detectChanges();
+
+            expect(component.value[1]).toEqual('10,5');
+            expect(component.value[2]).toEqual('12,2');
+        }));
+    });
+
     describe('Adding tags with spaces when the allowSpaces option is enabled', () => {
         it('Spaces are preserved and not tagged', fakeAsync(() => {
             inputPO.focus();
@@ -334,14 +352,14 @@ describe('InputTag', () => {
 
     describe('Editing tags', () => {
         it('Edits tags', () => {
-            component.onTagEdited('Hapica', TAG);
+            component.onTagEdited('Hapica', 0);
             fixture.detectChanges();
 
             expect(component.value[0]).toBe('Hapica');
         });
 
         it('Moves focus to the input field after editing', () => {
-            component.onTagEdited('Hapica', TAG);
+            component.onTagEdited('Hapica', 0);
             fixture.detectChanges();
 
             expect(inputPO.focused).toBe(true);
@@ -390,9 +408,62 @@ describe('InputTag', () => {
         });
     });
 
+    it('reuse example text as placeholder', () => {
+        expect(component.hasValue).toBeTruthy();
+        expect(component.labelOutside).toBeTruthy();
+        expect(component.inputHidden).toBeFalsy();
+        expect(component.hasExampleText).toBeFalsy();
+        expect(component.hasPlaceholder).toBeFalsy();
+        expect(getPlaceholderText(fixture)).toEqual('Example');
+
+        testComponent.control.reset();
+        fixture.detectChanges();
+
+        expect(component.hasValue).toBeFalsy();
+        expect(component.labelOutside).toBeTruthy();
+        expect(component.inputHidden).toBeFalsy();
+        expect(component.hasExampleText).toEqual(false);
+        expect(component.hasPlaceholder).toEqual(true);
+        expect(getPlaceholderText(fixture)).toEqual('Placeholder');
+
+        // noinspection DuplicatedCode
+        component.inputHidden = true;
+        fixture.detectChanges();
+
+        expect(component.hasValue).toBeFalsy();
+        expect(component.labelOutside).toBeTruthy();
+        expect(component.inputHidden).toBeTruthy();
+        expect(component.hasExampleText).toEqual(false);
+        expect(component.hasPlaceholder).toEqual(true);
+        expect(getPlaceholderText(fixture)).toEqual('Placeholder');
+
+        testComponent.defaultInputs = true;
+        testComponent.labelOutside = true;
+        // noinspection DuplicatedCode
+        component.inputHidden = true;
+        fixture.detectChanges();
+
+        expect(component.hasValue).toBeFalsy();
+        expect(component.labelOutside).toBeTruthy();
+        expect(component.inputHidden).toBeTruthy();
+        expect(component.hasExampleText).toEqual(false);
+        expect(component.hasPlaceholder).toEqual(true);
+        expect(getPlaceholderText(fixture)).toEqual('');
+    });
+
     testPlaceholder(testContext, ['test'], []);
 
     testCleaner(testContext, ['test'], []);
 
     testTooltip(testContext);
 });
+
+function getPlaceholderText<T>(fixture: ComponentFixture<T>) {
+    return (
+        new PageObject(fixture)
+            .getByAutomationId('tui-input-tag__placeholder')
+            ?.nativeElement.innerText?.trim() ||
+        new PageObject(fixture)?.getByAutomationId('tui-input-tag__native')?.nativeElement
+            .placeholder
+    );
+}

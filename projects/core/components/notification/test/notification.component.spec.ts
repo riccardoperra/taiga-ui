@@ -5,8 +5,7 @@ import {
     TUI_NOTIFICATION_DEFAULT_OPTIONS,
     TUI_NOTIFICATION_OPTIONS,
 } from '@taiga-ui/core/tokens';
-import {PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, PageObject} from '@taiga-ui/testing';
 
 import {TuiNotification} from '../../../enums/notification';
 import {TuiSvgService} from '../../../services/svg.service';
@@ -33,7 +32,7 @@ describe('Notification', () => {
     })
     class TestComponent {
         @ViewChild(TuiNotificationComponent, {static: false})
-        component: TuiNotificationComponent;
+        component!: TuiNotificationComponent;
 
         hasCloseButton = true;
         hasIcon = true;
@@ -120,7 +119,7 @@ describe('Notification with TUI_NOTIFICATION_OPTIONS', () => {
     })
     class TestComponent {
         @ViewChild(TuiNotificationComponent, {static: false})
-        component: TuiNotificationComponent;
+        component!: TuiNotificationComponent;
     }
 
     const status = TuiNotification.Error;

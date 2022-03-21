@@ -9,6 +9,11 @@ import {
 import {TuiFormatNumberPipeModule} from '@taiga-ui/core';
 
 import {TuiSliderComponent} from './slider.component';
+import {
+    TuiSliderKeyStepsDirective,
+    TuiSliderTickLabelPipe,
+} from './slider-key-steps.directive';
+import {TuiSliderOldComponent} from './slider-old.component';
 
 @NgModule({
     imports: [
@@ -19,7 +24,17 @@ import {TuiSliderComponent} from './slider.component';
         TuiActiveZoneModule,
         TuiFormatNumberPipeModule,
     ],
-    declarations: [TuiSliderComponent],
-    exports: [TuiSliderComponent],
+    declarations: [
+        TuiSliderComponent,
+        TuiSliderKeyStepsDirective,
+        TuiSliderTickLabelPipe,
+        TuiSliderOldComponent,
+    ],
+    exports: [
+        TuiSliderComponent,
+        TuiSliderKeyStepsDirective,
+        TuiSliderTickLabelPipe,
+        TuiSliderOldComponent,
+    ],
 })
 export class TuiSliderModule {}

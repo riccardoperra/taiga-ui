@@ -27,7 +27,7 @@ export class TuiTabsExample5 {
     open = false;
 
     get activeItemIndex(): number {
-        if (this.collaborators.indexOf(this.activeElement) !== -1) {
+        if (this.collaborators.includes(this.activeElement)) {
             return this.tabs.indexOf(this.collaborators);
         }
 
@@ -44,7 +44,7 @@ export class TuiTabsExample5 {
         this.open = false;
     }
 
-    isString(tab: any): boolean {
+    isString(tab: unknown): tab is string {
         return typeof tab === 'string';
     }
 }

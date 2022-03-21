@@ -1,6 +1,12 @@
 import {Component, forwardRef, ViewChild} from '@angular/core';
 import {changeDetection} from '@demo/emulate/change-detection';
-import {TuiAutofillFieldName, TuiInputModeT, TuiInputTypeT} from '@taiga-ui/cdk';
+import {TuiDocExample} from '@taiga-ui/addon-doc';
+import {
+    TuiAutofillFieldName,
+    TuiContextWithImplicit,
+    TuiInputModeT,
+    TuiInputTypeT,
+} from '@taiga-ui/cdk';
 import {
     TuiDirection,
     TuiHintModeT,
@@ -10,13 +16,6 @@ import {
 } from '@taiga-ui/core';
 import {PolymorpheusContent} from '@tinkoff/ng-polymorpheus';
 
-import {default as example1Ts} from '!!raw-loader!./examples/1/component.ts';
-import {default as example1Less} from '!!raw-loader!./examples/1/style.less';
-import {default as example1Html} from '!!raw-loader!./examples/1/template.html';
-import {default as exampleImportModule} from '!!raw-loader!./examples/import/import-module.txt';
-import {default as exampleInsertTemplate} from '!!raw-loader!./examples/import/insert-template.txt';
-
-import {FrontEndExample} from '../../interfaces/front-end-example';
 import {ABSTRACT_PROPS_ACCESSOR} from '../abstract/inherited-documentation/abstract-props-accessor';
 import {AbstractExampleTuiInteractive} from '../abstract/interactive';
 
@@ -28,6 +27,7 @@ viewBox="0 0 24 24">
    c0-0.6-0.4-1-1-1s-1,0.4-1,1v2h-1c-1.3,0-3,1.9-3,4v4.2L6.4,17H10z M3.6,19L5,14.8V11c0-2.7,1.9-5.2,4-5.8V5c0-1.7,1.3-3,3-3
    s3,1.3,3,3v0.1c2.3,0.6,4,3,4,5.9v3.8l1.4,4.2h-4.5c-0.4,1.8-2,3-3.9,3c-1.8,0-3.4-1.2-3.9-3H3.6z"/>
 </svg>`;
+const CUSTOM_SVG_NAME = 'Bell';
 
 @Component({
     selector: 'example-tui-primitive-textfield',
@@ -43,16 +43,24 @@ viewBox="0 0 24 24">
 })
 export class ExampleTuiPrimitiveTextfieldComponent extends AbstractExampleTuiInteractive {
     @ViewChild('interactiveContent')
-    private readonly interactiveIcon: PolymorpheusContent = '';
+    private readonly interactiveIcon: PolymorpheusContent<
+        TuiContextWithImplicit<TuiSizeS | TuiSizeL>
+    > = '';
 
-    readonly example1: FrontEndExample = {
-        TypeScript: example1Ts,
-        HTML: example1Html,
-        LESS: example1Less,
+    readonly example1: TuiDocExample = {
+        TypeScript: import('!!raw-loader!./examples/1/index.ts'),
+        HTML: import('!!raw-loader!./examples/1/index.html'),
+        LESS: import('!!raw-loader!./examples/1/index.less'),
     };
 
-    readonly exampleImportModule = exampleImportModule;
-    readonly exampleInsertTemplate = exampleInsertTemplate;
+    readonly example2: TuiDocExample = {
+        TypeScript: import('!!raw-loader!./examples/2/index.ts'),
+        HTML: import('!!raw-loader!./examples/2/index.html'),
+    };
+
+    readonly exampleModule = import('!!raw-loader!./examples/import/import-module.md');
+
+    readonly exampleHtml = import('!!raw-loader!./examples/import/insert-template.md');
 
     readonly themes = ['Taiga UI', 'Bootstrap', 'Material'];
     theme = this.themes[0];
@@ -73,7 +81,7 @@ export class ExampleTuiPrimitiveTextfieldComponent extends AbstractExampleTuiInt
         'url',
     ];
 
-    type = 'text';
+    type: TuiInputTypeT = 'text';
 
     cleaner = false;
 
@@ -112,11 +120,13 @@ export class ExampleTuiPrimitiveTextfieldComponent extends AbstractExampleTuiInt
 
     inputMode = this.inputModeVariants[0];
 
-    readonly customContentVariants = ['Bell'];
+    readonly customContentVariants = [CUSTOM_SVG_NAME, `<span>LongTextContent</span>`];
 
     customContentSelected = null;
 
     password = '';
+
+    example2Value = 'mail@example.com';
 
     value = '';
 
@@ -154,10 +164,12 @@ export class ExampleTuiPrimitiveTextfieldComponent extends AbstractExampleTuiInt
     hintMode: TuiHintModeT | null = null;
 
     get customContent(): string | null {
-        return this.customContentSelected !== null ? CUSTOM_SVG : null;
+        return this.customContentSelected === CUSTOM_SVG_NAME
+            ? CUSTOM_SVG
+            : this.customContentSelected;
     }
 
-    get iconContent(): PolymorpheusContent {
+    get iconContent(): PolymorpheusContent<TuiContextWithImplicit<TuiSizeS | TuiSizeL>> {
         if (this.selectedIcon === '') {
             return '';
         }

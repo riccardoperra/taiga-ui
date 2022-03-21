@@ -4,7 +4,9 @@
 
 export * from './core/button/button.harness';
 export * from './core/loader/loader.harness';
+export * from './exceptions';
 export * from './utils/active-element';
+export * from './utils/configure-test-suite';
 export * from './utils/date';
 export * from './utils/helpers';
 export * from './utils/input/cleaner.unit-common';

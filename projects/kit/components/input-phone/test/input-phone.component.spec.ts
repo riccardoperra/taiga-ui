@@ -7,9 +7,8 @@ import {
     TuiRootModule,
     TuiTextfieldControllerModule,
 } from '@taiga-ui/core';
-import {NativeInputPO, PageObject} from '@taiga-ui/testing';
+import {configureTestSuite, NativeInputPO, PageObject} from '@taiga-ui/testing';
 import {NG_EVENT_PLUGINS} from '@tinkoff/ng-event-plugins';
-import {configureTestSuite} from 'ng-bullet';
 
 import {TuiInputPhoneComponent} from '../input-phone.component';
 import {TuiInputPhoneModule} from '../input-phone.module';
@@ -330,7 +329,7 @@ describe('InputPhone', () => {
 
         fixture.whenStable().then(() => {
             fixture.detectChanges();
-            expect(component.nativeValue).toBe('+7 123 456-78-90');
+            expect(component.computedValue).toBe('+7 123 456-78-90');
             done();
         });
     }
@@ -348,7 +347,7 @@ describe('InputPhone', () => {
         getTel().dispatchEvent(dragEvent);
         fixture.whenStable().then(() => {
             fixture.detectChanges();
-            expect(component.nativeValue).toBe('+7 123 456-78-90');
+            expect(component.computedValue).toBe('+7 123 456-78-90');
             done();
         });
     }

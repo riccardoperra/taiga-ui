@@ -1,8 +1,7 @@
 import {Component, ViewChild} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {TUI_FIRST_DAY, TuiDay, TuiDayRange, TuiYear} from '@taiga-ui/cdk';
-import {PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, PageObject} from '@taiga-ui/testing';
 
 import {TuiInteractiveState} from '../../../enums/interactive-state';
 import {TuiRangeState} from '../../../enums/range-state';
@@ -23,7 +22,7 @@ describe('TuiPrimitiveYearPickerComponent', () => {
     })
     class TestComponent {
         @ViewChild(TuiPrimitiveYearPickerComponent, {static: true})
-        component: TuiPrimitiveYearPickerComponent;
+        component!: TuiPrimitiveYearPickerComponent;
 
         min = TUI_FIRST_DAY;
         max = TuiDay.currentLocal().append({year: 200});

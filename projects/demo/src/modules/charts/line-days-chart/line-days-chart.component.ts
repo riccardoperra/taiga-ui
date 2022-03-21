@@ -13,8 +13,8 @@ import {default as example2Html} from '!!raw-loader!./examples/2/index.html';
 import {default as example2Less} from '!!raw-loader!./examples/2/index.less';
 import {default as example2Ts} from '!!raw-loader!./examples/2/index.ts';
 import {default as example2Pipe} from '!!raw-loader!./examples/2/pipe.ts';
-import {default as exampleImportModule} from '!!raw-loader!./examples/import/import-module.txt';
-import {default as exampleInsertTemplate} from '!!raw-loader!./examples/import/insert-template.txt';
+import {default as exampleModule} from '!!raw-loader!./examples/import/import-module.txt';
+import {default as exampleHtml} from '!!raw-loader!./examples/import/insert-template.txt';
 
 import {FrontEndExample} from '../../interfaces/front-end-example';
 
@@ -26,8 +26,8 @@ import {FrontEndExample} from '../../interfaces/front-end-example';
     changeDetection,
 })
 export class ExampleTuiLineDaysChartComponent {
-    readonly exampleImportModule = exampleImportModule;
-    readonly exampleInsertTemplate = exampleInsertTemplate;
+    readonly exampleModule = exampleModule;
+    readonly exampleHtml = exampleHtml;
 
     readonly example1: FrontEndExample = {
         TypeScript: example1Ts,
@@ -42,7 +42,7 @@ export class ExampleTuiLineDaysChartComponent {
         Pipe: example2Pipe,
     };
 
-    readonly valueVariants = [
+    readonly valueVariants: ReadonlyArray<ReadonlyArray<[TuiDay, number]>> = [
         new Array(91)
             .fill(0)
             .reduce<ReadonlyArray<[TuiDay, number]>>(
@@ -65,7 +65,7 @@ export class ExampleTuiLineDaysChartComponent {
         ],
     ];
 
-    readonly value = this.valueVariants[0];
+    value = this.valueVariants[0];
 
     readonly labels$: Observable<readonly string[]> = this.months$.pipe(
         map(months => Array.from({length: 3}, (_, i) => months[i])),

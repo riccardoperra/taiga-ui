@@ -17,8 +17,7 @@ import {
     TuiInputDateTimeModule,
 } from '@taiga-ui/kit/components';
 import {TUI_DATE_TIME_VALUE_TRANSFORMER} from '@taiga-ui/kit/tokens';
-import {NativeInputPO, PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, NativeInputPO, PageObject} from '@taiga-ui/testing';
 
 @Component({
     template: `
@@ -33,7 +32,7 @@ import {configureTestSuite} from 'ng-bullet';
 })
 class TestComponent {
     @ViewChild(TuiInputDateTimeComponent)
-    dateTimeComponent: TuiInputDateTimeComponent;
+    dateTimeComponent!: TuiInputDateTimeComponent;
 
     readonly control = new FormControl([new TuiDay(2021, 6, 12), null]);
 
@@ -547,6 +546,6 @@ function getCalendarCell(dayNumber: number): DebugElement | null {
     return (
         pageObject
             .getAllByAutomationId(testContext.calendarCellAutomationId)
-            .find(el => +el.nativeElement.innerText.trim() === dayNumber) || null
+            .find(el => Number(el.nativeElement.innerText.trim()) === dayNumber) || null
     );
 }

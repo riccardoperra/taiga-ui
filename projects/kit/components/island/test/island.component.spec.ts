@@ -1,8 +1,7 @@
 import {Component, DebugElement, ViewChild} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {TuiSizeL} from '@taiga-ui/core';
-import {PageObject} from '@taiga-ui/testing';
-import {configureTestSuite} from 'ng-bullet';
+import {configureTestSuite, PageObject} from '@taiga-ui/testing';
 
 import {TuiIslandComponent} from '../island.component';
 import {TuiIslandModule} from '../island.module';
@@ -22,7 +21,7 @@ describe('Island', () => {
     })
     class TestComponent {
         @ViewChild(TuiIslandComponent, {static: true})
-        component: TuiIslandComponent;
+        component!: TuiIslandComponent;
 
         hoverable = false;
         textAlign: 'left' | 'right' | 'center' = 'left';

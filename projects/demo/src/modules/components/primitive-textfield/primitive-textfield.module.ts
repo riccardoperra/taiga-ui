@@ -1,6 +1,6 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {generateRoutes, TuiAddonDocModule} from '@taiga-ui/addon-doc';
 import {
@@ -9,6 +9,7 @@ import {
     TuiHintModule,
     TuiLabelModule,
     TuiLinkModule,
+    TuiNotificationModule,
     TuiPrimitiveTextfieldModule,
     TuiSvgModule,
     TuiTextfieldControllerModule,
@@ -21,18 +22,21 @@ import {ThemesModule} from '../../themes/themes.module';
 import {HintControllerDocumentationModule} from '../abstract/hint-controller-documentation/hint-controller-documentation.module';
 import {InheritedDocumentationModule} from '../abstract/inherited-documentation/inherited-documentation.module';
 import {TextfieldControllerDocumentationModule} from '../abstract/textfield-controller-documentation/textfield-controller-documentation.module';
-import {TuiPrimitiveTextfieldExample1} from './examples/1/component';
+import {TuiPrimitiveTextfieldExample1} from './examples/1';
+import {TuiPrimitiveTextfieldExample2} from './examples/2';
 import {ExampleTuiPrimitiveTextfieldComponent} from './primitive-textfield.component';
 
 @NgModule({
     imports: [
         CommonModule,
         FormsModule,
+        ReactiveFormsModule,
         InheritedDocumentationModule,
         HintControllerDocumentationModule,
         TextfieldControllerDocumentationModule,
         TuiPrimitiveTextfieldModule,
         TuiTextfieldControllerModule,
+        TuiNotificationModule,
         TuiHintControllerModule,
         TuiAvatarModule,
         TuiLinkModule,
@@ -47,7 +51,11 @@ import {ExampleTuiPrimitiveTextfieldComponent} from './primitive-textfield.compo
         TuiAddonDocModule,
         RouterModule.forChild(generateRoutes(ExampleTuiPrimitiveTextfieldComponent)),
     ],
-    declarations: [ExampleTuiPrimitiveTextfieldComponent, TuiPrimitiveTextfieldExample1],
+    declarations: [
+        ExampleTuiPrimitiveTextfieldComponent,
+        TuiPrimitiveTextfieldExample1,
+        TuiPrimitiveTextfieldExample2,
+    ],
     exports: [ExampleTuiPrimitiveTextfieldComponent],
 })
 export class ExampleTuiPrimitiveTextfieldModule {}
